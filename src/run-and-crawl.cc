@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <gf/Action.h>
 #include <gf/Clock.h>
 #include <gf/Color.h>
 #include <gf/EntityContainer.h>
@@ -29,14 +30,20 @@
 #include "local/Player.h"
 
 int main() {
-    // initialization
+    // Create the window
+    gf::Window window("Run and Crawl", ScreenSize);
+    gf::RenderWindow renderer(window);
+    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(60);
+
+    // Initialization entities
     gf::EntityContainer mainEntities;
 
     // Set the player
     Player player1({ 0, 0 });
     mainEntities.addEntity(player1);
 
-    // add cameras
+    // Add cameras
     gf::ViewContainer views;
 
     gf::ExtendView mainView;
@@ -46,12 +53,15 @@ int main() {
 
     views.setInitialScreenSize(ScreenSize);
 
-    gf::Window window("Run and Crawl", ScreenSize);
-    gf::RenderWindow renderer(window);
-    window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(60);
+    // Add actions
+    gf::ActionContainer actions;
 
-    // game loop
+    gf::Action closeWindowAction("Close window");
+    closeWindowAction.addCloseControl();
+    closeWindowAction.addKeycodeKeyControl(gf::Keycode::Escape);
+    actions.addAction(closeWindowAction);
+
+    // Game loop
     gf::Clock clock;
 
     renderer.clear(gf::Color::White);
@@ -60,20 +70,14 @@ int main() {
         // Input
         gf::Event event;
         while (window.pollEvent(event)) {
+            actions.processEvent(event);
             views.processEvent(event);
-            switch (event.type) {
-                case gf::EventType::Closed:
-                window.close();
-                break;
-
-                case gf::EventType::KeyPressed:
-
-                break;
-
-                default:
-                break;
-            }
         }
+
+        if (closeWindowAction.isActive()) {
+            window.close();
+        }
+
 
         gf::Time time = clock.restart();
 
