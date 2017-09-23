@@ -48,6 +48,8 @@ int main() {
 
     gf::Window window("Run and Crawl", ScreenSize);
     gf::RenderWindow renderer(window);
+    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(60);
 
     // game loop
     gf::Clock clock;
