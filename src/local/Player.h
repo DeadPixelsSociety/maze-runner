@@ -19,6 +19,7 @@
 #ifndef _PLAYER_LOCAL_H
 #define _PLAYER_LOCAL_H
 
+#include <gf/Direction.h>
 #include <gf/Entity.h>
 #include <gf/Vector.h>
 
@@ -26,11 +27,19 @@ class Player: public gf::Entity {
 public:
     Player(const gf::Vector2i position);
 
+    void goUp();
+    void goDown();
+    void goRight();
+    void goLeft();
+
     virtual void update(gf::Time time) override;
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
 private:
     gf::Vector2i m_position;
+    bool m_wantsMove;
+    gf::Direction m_direction;
+    float m_timeElapsed;
 };
 
 #endif // _PLAYER_LOCAL_H

@@ -24,19 +24,60 @@
 #include "Player.h"
 
 Player::Player(const gf::Vector2i position) :
-    m_position(position) {
+    m_position(position)
+    , m_wantsMove(false)
+    , m_direction(gf::Direction::Left)
+    , m_timeElapsed(0.0f) {
     // Constructor
 }
 
+void Player::goUp() {
+    m_wantsMove = true;
+    m_direction = gf::Direction::Up;
+}
+
+void Player::goDown() {
+    m_wantsMove = true;
+    m_direction = gf::Direction::Down;
+}
+
+void Player::goRight() {
+    m_wantsMove = true;
+    m_direction = gf::Direction::Right;
+}
+
+void Player::goLeft() {
+    m_wantsMove = true;
+    m_direction = gf::Direction::Left;
+}
+
 void Player::update(gf::Time time) {
-    // Nothing
+    // Temporary
+    if (m_wantsMove == true) {
+        switch (m_direction) {
+        case gf::Direction::Up:
+            m_position.y--;
+            break;
+        case gf::Direction::Down:
+            m_position.y++;
+            break;
+        case gf::Direction::Right:
+            m_position.x++;
+            break;
+        case gf::Direction::Left:
+            m_position.x--;
+            break;
+        }
+
+        m_wantsMove = false;
+    }
 }
 
 void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {
     gf::CircleShape circle(50);
     circle.setColor(gf::Color::Red);
     circle.setAnchor(gf::Anchor::Center);
-    circle.setPosition(m_position * TileSize - 0.5f * TileSize);
+    circle.setPosition(m_position * TileSize + 0.5f * TileSize);
 
     target.draw(circle, states);
 }
