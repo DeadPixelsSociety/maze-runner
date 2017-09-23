@@ -21,6 +21,11 @@
 
 static constexpr gf::Vector2i ScreenSize = { 1024, 768 };
 
-static constexpr float VisibleSize = 3000.0f;
+// Map constants
+static constexpr float TileSize = 100.0f; // pixel
+static constexpr gf::Vector2i WorldBounds = { 21, 21 }; // Number of tiles
+static constexpr gf::Vector2i WorldCenter = { 11, 11 }; // Tiles coordinates
+// static constexpr gf::Vector2f WorldSize = WorldBounds * TileSize; // pixel // Not compile, why?
+static constexpr gf::Vector2f WorldSize = { WorldBounds.data[0] * TileSize, WorldBounds.data[1] * TileSize }; // pixel // dirty
 
 #endif //_LOCAL_CONSTANTS_H

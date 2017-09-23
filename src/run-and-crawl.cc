@@ -21,6 +21,7 @@
 #include <gf/Color.h>
 #include <gf/EntityContainer.h>
 #include <gf/Event.h>
+#include <gf/Log.h>
 #include <gf/RenderWindow.h>
 #include <gf/ViewContainer.h>
 #include <gf/Views.h>
@@ -36,19 +37,23 @@ int main() {
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(60);
 
+    // Set level log
+    gf::Log::setLevel(gf::Log::Debug);
+
     // Initialization entities
     gf::EntityContainer mainEntities;
 
     // Set the player
-    Player player1({ 0, 0 });
+    Player player1(WorldCenter);
     mainEntities.addEntity(player1);
 
     // Add cameras
     gf::ViewContainer views;
 
     gf::ExtendView mainView;
-    mainView.setSize({ VisibleSize, VisibleSize });
-    mainView.setCenter({ VisibleSize*0.5f, VisibleSize*0.5f });
+    mainView.setSize(WorldSize);
+    mainView.setCenter({ WorldSize.width * 0.5f, WorldSize.height * 0.5f });
+    // mainView.setCenter(0.5f * WorldBounds.width); // Not compile, why?
     views.addView(mainView);
 
     views.setInitialScreenSize(ScreenSize);
@@ -77,7 +82,6 @@ int main() {
         if (closeWindowAction.isActive()) {
             window.close();
         }
-
 
         gf::Time time = clock.restart();
 
