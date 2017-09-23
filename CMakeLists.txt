@@ -19,6 +19,7 @@ endif()
 
 add_executable(rc
     src/run-and-crawl.cc
+    src/local/Player.cc
 )
 
 target_include_directories(rc

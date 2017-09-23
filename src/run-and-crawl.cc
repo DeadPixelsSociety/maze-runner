@@ -18,14 +18,35 @@
 
 #include <gf/Clock.h>
 #include <gf/Color.h>
+#include <gf/EntityContainer.h>
 #include <gf/Event.h>
 #include <gf/RenderWindow.h>
+#include <gf/ViewContainer.h>
+#include <gf/Views.h>
 #include <gf/Window.h>
+
+#include "local/Constants.h"
+#include "local/Player.h"
 
 int main() {
     // initialization
+    gf::EntityContainer mainEntities;
 
-    gf::Window window("Run and Crawl", { 1024, 768 });
+    // Set the player
+    Player player1({ 0, 0 });
+    mainEntities.addEntity(player1);
+
+    // add cameras
+    gf::ViewContainer views;
+
+    gf::ExtendView mainView;
+    mainView.setSize({ VisibleSize, VisibleSize });
+    mainView.setCenter({ VisibleSize*0.5f, VisibleSize*0.5f });
+    views.addView(mainView);
+
+    views.setInitialScreenSize(ScreenSize);
+
+    gf::Window window("Run and Crawl", ScreenSize);
     gf::RenderWindow renderer(window);
 
     // game loop
@@ -37,6 +58,7 @@ int main() {
         // Input
         gf::Event event;
         while (window.pollEvent(event)) {
+            views.processEvent(event);
             switch (event.type) {
                 case gf::EventType::Closed:
                 window.close();
@@ -51,13 +73,16 @@ int main() {
             }
         }
 
-        float dt = clock.restart().asSeconds();
+        gf::Time time = clock.restart();
 
         // Update
-
-        renderer.clear();
+        mainEntities.update(time);
 
         // Render
+        renderer.clear();
+
+        renderer.setView(mainView);
+        mainEntities.render(renderer);
 
         renderer.display();
     }
