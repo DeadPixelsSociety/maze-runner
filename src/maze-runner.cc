@@ -32,7 +32,7 @@
 
 int main() {
     // Create the window
-    gf::Window window("Run and Crawl", ScreenSize);
+    gf::Window window("Maze Runner", ScreenSize);
     gf::RenderWindow renderer(window);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(60);
