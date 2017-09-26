@@ -28,6 +28,7 @@
 #include <gf/Window.h>
 
 #include "local/Constants.h"
+#include "local/Map.h"
 #include "local/Player.h"
 
 int main() {
@@ -50,6 +51,10 @@ int main() {
     // Set the player 2
     Player player2({ WorldBounds.x - 1, WorldCenter.y });
     mainEntities.addEntity(player2);
+
+    // Set the map
+    Map map;
+    mainEntities.addEntity(map);
 
     // Add cameras
     gf::ViewContainer views;

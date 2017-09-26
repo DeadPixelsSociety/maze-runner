@@ -24,7 +24,8 @@
 #include "Player.h"
 
 Player::Player(const gf::Vector2i position) :
-    m_position(position)
+    gf::Entity(20)
+    , m_position(position)
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
     , m_timeElapsed(0.0f) {

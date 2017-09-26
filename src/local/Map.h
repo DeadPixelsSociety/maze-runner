@@ -16,18 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _LOCAL_CONSTANTS_H
-#define _LOCAL_CONSTANTS_H
+#ifndef _MAP_LOCAL_H
+#define _MAP_LOCAL_H
 
-#include <gf/Vector.h>
+#include <gf/Entity.h>
 
-static constexpr gf::Vector2i ScreenSize = { 1024, 768 };
+class Map: public gf::Entity {
+public:
+    Map();
 
-// Map constants
-static constexpr float TileSize = 100.0f; // pixel
-static constexpr gf::Vector2i WorldBounds = { 21, 21 }; // Number of tiles
-static constexpr gf::Vector2i WorldCenter = { 11, 11 }; // Tiles coordinates
-// static constexpr gf::Vector2f WorldSize = WorldBounds * TileSize; // pixel // Not compile, why?
-static constexpr gf::Vector2f WorldSize = { WorldBounds.data[0] * TileSize, WorldBounds.data[1] * TileSize }; // pixel // dirty
+    virtual void update(gf::Time time) override;
+    virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
-#endif //_LOCAL_CONSTANTS_H
+private:
+};
+
+#endif // _MAP_LOCAL_H

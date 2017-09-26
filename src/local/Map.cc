@@ -16,18 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _LOCAL_CONSTANTS_H
-#define _LOCAL_CONSTANTS_H
+#include <gf/RenderTarget.h>
+#include <gf/Shapes.h>
 
-#include <gf/Vector.h>
+#include "Constants.h"
+#include "Map.h"
 
-static constexpr gf::Vector2i ScreenSize = { 1024, 768 };
+Map::Map() :
+    gf::Entity(10) {
+    // Nothing
+}
 
-// Map constants
-static constexpr float TileSize = 100.0f; // pixel
-static constexpr gf::Vector2i WorldBounds = { 21, 21 }; // Number of tiles
-static constexpr gf::Vector2i WorldCenter = { 11, 11 }; // Tiles coordinates
-// static constexpr gf::Vector2f WorldSize = WorldBounds * TileSize; // pixel // Not compile, why?
-static constexpr gf::Vector2f WorldSize = { WorldBounds.data[0] * TileSize, WorldBounds.data[1] * TileSize }; // pixel // dirty
+void Map::update(gf::Time time) {
+    // Nothing
+}
 
-#endif //_LOCAL_CONSTANTS_H
+void Map::render(gf::RenderTarget &target, const gf::RenderStates &states) {
+    gf::RectangleShape background;
+    background.setSize(WorldSize);
+    background.setPosition({ 0.0f, 0.0f });
+    background.setColor(gf::Color::Black);
+
+    target.draw(background, states);
+}
