@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cassert>
+
 #include <gf/Color.h>
 #include <gf/Shapes.h>
 #include <gf/RenderTarget.h>
@@ -68,6 +70,8 @@ void Player::update(gf::Time time) {
         case gf::Direction::Left:
             m_position.x--;
             break;
+        default:
+            assert(false);
         }
 
         m_wantsMove = false;
