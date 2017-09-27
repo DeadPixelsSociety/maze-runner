@@ -62,7 +62,7 @@ int main() {
     gf::ExtendView mainView;
     mainView.setSize(WorldSize);
     mainView.setCenter({ WorldSize.width * 0.5f, WorldSize.height * 0.5f });
-    // mainView.setCenter(0.5f * WorldBounds.width); // Not compile, why?
+    // mainView.setCenter(0.5f * WorldBounds); // Not compile, why?
     views.addView(mainView);
 
     views.setInitialScreenSize(ScreenSize);

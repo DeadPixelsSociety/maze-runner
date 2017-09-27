@@ -81,8 +81,7 @@ void Player::update(gf::Time time) {
 void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {
     gf::CircleShape circle(50);
     circle.setColor(gf::Color::Red);
-    circle.setAnchor(gf::Anchor::Center);
-    circle.setPosition(m_position * TileSize + 0.5f * TileSize);
+    circle.setPosition(m_position * TileSize);
 
     target.draw(circle, states);
 }
