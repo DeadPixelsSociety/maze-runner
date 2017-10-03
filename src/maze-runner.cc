@@ -29,9 +29,33 @@
 
 #include "local/Constants.h"
 #include "local/Map.h"
+#include "local/Network.h"
 #include "local/Player.h"
 
-int main() {
+
+int main(int argc, char *argv[]) {
+    if(argc<2){
+        printf("Need one Parameter\n");
+        printf("Use -c for client\nUse -s for Server\n");
+        return 1;
+    }
+    int status;
+    if(argv[1][1]=='s'){
+      //TODO recover error code
+        Server();
+        status=0;//0 = Server
+    } else if (argv[1][1]=='c') {
+      //TODO recover error code
+        Client();
+        status=1;//1 = Client
+    } else if (argv[1][1]=='h') {
+        printf("Use -c for client\nUse -s for Server\n");
+        return 0;
+    } else {
+        printf("Use -c for client\nUse -s for Server\n");
+        return 1;
+    }
+
     // Create the window
     gf::Window window("Maze Runner", ScreenSize);
     gf::RenderWindow renderer(window);
@@ -124,6 +148,7 @@ int main() {
     while (window.isOpen()) {
         // Input
         gf::Event event;
+        char dir;
         while (window.pollEvent(event)) {
             actions.processEvent(event);
             views.processEvent(event);
@@ -133,34 +158,75 @@ int main() {
         if (closeWindowAction.isActive()) {
             window.close();
         }
-
-        // Actions for player 1
-        if (rightActionPlayer1.isActive()) {
+        if(status==0){
+          // Actions for player 1
+          if (rightActionPlayer1.isActive()) {
             player1.goRight();
-        }
-        else if (leftActionPlayer1.isActive()) {
+            sendDirection(0,'R');
+          }
+          else if (leftActionPlayer1.isActive()) {
             player1.goLeft();
-        }
-        else if (upActionPlayer1.isActive()) {
+            sendDirection(0,'L');
+          }
+          else if (upActionPlayer1.isActive()) {
             player1.goUp();
-        }
-        else if (downActionPlayer1.isActive()) {
+            sendDirection(0,'U');
+          }
+          else if (downActionPlayer1.isActive()) {
             player1.goDown();
+            sendDirection(0,'D');
+          }
+
+          // Actions for player 2
+          dir = receivedDirection(0);
+          if (dir=='R') {
+            player2.goRight();
+          }
+          else if (dir=='L') {
+            player2.goLeft();
+          }
+          else if (dir=='U') {
+            player2.goUp();
+          }
+          else if (dir=='D') {
+            player2.goDown();
+          }
+        } else {
+          dir=receivedDirection(1);
+          // Actions for player 1
+          if (dir=='R') {
+            player1.goRight();
+          }
+          else if (dir=='L') {
+            player1.goLeft();
+          }
+          else if (dir=='U') {
+            player1.goUp();
+          }
+          else if (dir=='D') {
+            player1.goDown();
+          }
+
+          // Actions for player 2
+          if (rightActionPlayer2.isActive()) {
+            player2.goRight();
+            sendDirection(1,'R');
+          }
+          else if (leftActionPlayer2.isActive()) {
+            player2.goLeft();
+            sendDirection(1,'L');
+          }
+          else if (upActionPlayer2.isActive()) {
+            player2.goUp();
+            sendDirection(1,'U');
+          }
+          else if (downActionPlayer2.isActive()) {
+            player2.goDown();
+            sendDirection(1,'D');
+          }
         }
 
-        // Actions for player 2
-        if (rightActionPlayer2.isActive()) {
-            player2.goRight();
-        }
-        else if (leftActionPlayer2.isActive()) {
-            player2.goLeft();
-        }
-        else if (upActionPlayer2.isActive()) {
-            player2.goUp();
-        }
-        else if (downActionPlayer2.isActive()) {
-            player2.goDown();
-        }
+
 
         gf::Time time = clock.restart();
 
