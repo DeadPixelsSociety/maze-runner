@@ -13,5 +13,5 @@ cmake ..
 make install (require superuser access)
 
 # Run the client:
-./ftl
+./maze-runner
 ```
