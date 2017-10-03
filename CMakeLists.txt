@@ -21,6 +21,7 @@ add_executable(maze-runner
     src/maze-runner.cc
     src/local/Map.cc
     src/local/Player.cc
+    src/local/Singletons.cc
 )
 
 target_include_directories(maze-runner
@@ -39,7 +40,7 @@ install(
     RUNTIME DESTINATION games
 )
 
-#install(
-#    DIRECTORY "${CMAKE_SOURCE_DIR}/data/run-and-crawl"
-#    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/games"
-#)
+install(
+   DIRECTORY "${CMAKE_SOURCE_DIR}/data/maze-runner"
+   DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/games"
+)

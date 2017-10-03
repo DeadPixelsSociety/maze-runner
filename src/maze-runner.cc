@@ -23,6 +23,7 @@
 #include <gf/Event.h>
 #include <gf/Log.h>
 #include <gf/RenderWindow.h>
+#include <gf/Singleton.h>
 #include <gf/ViewContainer.h>
 #include <gf/Views.h>
 #include <gf/Window.h>
@@ -30,6 +31,9 @@
 #include "local/Constants.h"
 #include "local/Map.h"
 #include "local/Player.h"
+#include "local/Singletons.h"
+
+#include "config.h"
 
 int main() {
     // Create the window
@@ -40,6 +44,10 @@ int main() {
 
     // Set level log
     gf::Log::setLevel(gf::Log::Debug);
+
+    // Set the singletons
+    gf::SingletonStorage<gf::ResourceManager> storageForResourceManager(gResourceManager);
+    gResourceManager().addSearchDir(RC_DATA_DIR);
 
     // Initialization entities
     gf::EntityContainer mainEntities;
