@@ -40,27 +40,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     int status;
-    /*
-    if(argv[1][1]=='s'){
-        Host host;
-        status=0;//0 = Server
-    } else if (argv[1][1]=='c') {
-        Challenger challenger;
-        status=1;//1 = Client
-    } else if (argv[1][1]=='h') {
-        printf("Use -c for client\nUse -s for Server\n");
-        return 0;
-    } else {
-        printf("Use -c for client\nUse -s for Server\n");
-        return 1;
-    }
-    */
     Host host;
     Challenger challenger;
     if(argv[1][1]=='s'){
       host.createConnection();
       status=0;//0 = Server
-    } else {
+    } else if(argv[1][1]=='c') {
       challenger.createConnection();
       status=1;//1 = Client
     }
@@ -157,11 +142,14 @@ int main(int argc, char *argv[]) {
 
     renderer.clear(gf::Color::White);
 
-    bool token;
+    bool myTurn;
+    bool hisTurn;
     if(status==0){
-      token=true;
+      myTurn=true;
+      hisTurn=false;
     } else {
-      token=false;
+      myTurn=false;
+      hisTurn=true;
     }
 
     while (window.isOpen()) {
@@ -192,44 +180,47 @@ int main(int argc, char *argv[]) {
         renderer.display();
 
       if(status==0){
-        //if(token) {
+        if(myTurn) {
           // Actions for player 1
-          //while(token){
+          while (myTurn) {
             if (rightActionPlayer1.isActive()) {
               player1.goRight();
               host.sendDirection('R');
-              //token=!token;
+              myTurn = !myTurn;
             } else if (leftActionPlayer1.isActive()) {
               player1.goLeft();
               host.sendDirection('L');
-              //token=!token;
+              myTurn = !myTurn;
             } else if (upActionPlayer1.isActive()) {
               player1.goUp();
               host.sendDirection('U');
-              //token=!token;
+              myTurn = !myTurn;
             } else if (downActionPlayer1.isActive()) {
               player1.goDown();
               host.sendDirection('D');
-              //token=!token;
+              myTurn = !myTurn;
             }
-          //}
-      /*
-        // Actions for player 2
-        dir = host.receivedDirection();
-        if (dir=='R') {
-          player2.goRight();
+          }
         }
-        else if (dir=='L') {
-          player2.goLeft();
+        if(myTurn == false){
+          hisTurn = true;
         }
-        else if (dir=='U') {
-          player2.goUp();
+        if(hisTurn) {
+          // Actions for player 2
+          dir = host.receivedDirection();
+          if (dir == 'R') {
+            player2.goRight();
+          } else if (dir == 'L') {
+            player2.goLeft();
+          } else if (dir == 'U') {
+            player2.goUp();
+          } else if (dir == 'D') {
+            player2.goDown();
+          }
         }
-        else if (dir=='D') {
-          player2.goDown();
-        }
-        */
+
       } else {
+        if(hisTurn) {
           dir = challenger.receivedDirection();
           // Actions for player 1
           if (dir == 'R') {
@@ -240,33 +231,36 @@ int main(int argc, char *argv[]) {
             player1.goUp();
           } else if (dir == 'D') {
             player1.goDown();
-          }/*
-        if (token) {
-          while(token){
+          }
+          hisTurn = false;
+        }
+        if(hisTurn == false){
+          myTurn=true;
+        }
+        if (myTurn) {
+          while(myTurn){
             // Actions for player 2
             if (rightActionPlayer2.isActive()) {
               player2.goRight();
               challenger.sendDirection('R');
-              token=!token;
+              myTurn = false;
             } else if (leftActionPlayer2.isActive()) {
               player2.goLeft();
               challenger.sendDirection('L');
-              token=!token;
+              myTurn = false;
             } else if (upActionPlayer2.isActive()) {
               player2.goUp();
               challenger.sendDirection('U');
-              token=!token;
+              myTurn = false;
             } else if (downActionPlayer2.isActive()) {
               player2.goDown();
               challenger.sendDirection('D');
-              token=!token;
+              myTurn = false;
             }
           }
-
-        }*/
+        }
       }
-
-        actions.reset();
+      actions.reset();
     }
 
     return 0;

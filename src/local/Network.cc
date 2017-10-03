@@ -8,7 +8,7 @@ Host::Host() {
 }
 
 void Host::createConnection(){
-  printf("Server \n");
+  printf("Server : Waiting for Client ... \n");
   // link listener to a port
   if (m_listener.listen(9000) != sf::Socket::Done) {
     printf("Error with port number\n");
@@ -23,13 +23,12 @@ void Host::createConnection(){
   printf("A client has connected to the server\n");
 }
 
-int Host::sendDirection(char dir) {
+void Host::sendDirection(char dir) {
   m_data[0] = dir;
   if (m_server.send(m_data, 2) != sf::Socket::Done) {
     printf("Data could not be sent\n");
     assert(false);
   }
-  return 0;
 }
 
 char Host::receivedDirection(){
@@ -37,6 +36,7 @@ char Host::receivedDirection(){
   if (m_server.receive(m_data, 2, received) != sf::Socket::Done) {
     printf("Data could not found\n");
   }
+  return m_data[0];
 }
 
 //################################CHALLENGER####################################
@@ -44,13 +44,12 @@ char Host::receivedDirection(){
 Challenger::Challenger() {
 }
 
-int Challenger::sendDirection(char dir) {
+void Challenger::sendDirection(char dir) {
   m_data[0] = dir;
   if (m_client.send(m_data, 2) != sf::Socket::Done) {
     printf("Data could not be sent\n");
     assert(false);
   }
-  return 0;
 }
 
 char Challenger::receivedDirection(){
@@ -63,9 +62,8 @@ char Challenger::receivedDirection(){
 }
 
 void Challenger::createConnection() {
-  printf("Client \n");
-  sf::Socket::Status status = m_client.connect("127.0.0.1", 9000);
 
+  sf::Socket::Status status = m_client.connect("127.0.0.1", 9000);
   if (status != sf::Socket::Done) {
     printf("Server not found\n");
     assert(false);

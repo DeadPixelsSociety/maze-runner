@@ -10,7 +10,7 @@ private:
   char m_data[2];
 public :
   Host();
-  int sendDirection(char dir);
+  void sendDirection(char dir);
   char receivedDirection();
   void createConnection();
 };
@@ -21,7 +21,7 @@ private:
   char m_data[2];
 public:
   Challenger();
-  int sendDirection(char dir);
+  void sendDirection(char dir);
   char receivedDirection();
   void createConnection();
 };
