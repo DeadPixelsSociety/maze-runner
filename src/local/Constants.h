@@ -1,5 +1,5 @@
 /*
- * Run and Crawl - A student indie game
+ * Maze Runner - A student indie game
  * Copyright (C) 2017-2018 to authors see AUTHORS file
  *
  * This program is free software: you can redistribute it and/or modify

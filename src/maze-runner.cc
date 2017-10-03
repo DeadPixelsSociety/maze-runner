@@ -1,5 +1,5 @@
 /*
- * Run and Crawl - A student indie game
+ * Maze Runner - A student indie game
  * Copyright (C) 2017-2018 to authors see AUTHORS file
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ int main() {
 
     // Set the singletons
     gf::SingletonStorage<gf::ResourceManager> storageForResourceManager(gResourceManager);
-    gResourceManager().addSearchDir(RC_DATA_DIR);
+    gResourceManager().addSearchDir(MR_DATA_DIR);
 
     // Initialization entities
     gf::EntityContainer mainEntities;
