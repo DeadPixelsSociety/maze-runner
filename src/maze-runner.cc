@@ -218,76 +218,6 @@ int main(int argc, char *argv[]) {
             window.close();
         }
 
-        if(status==0){
-            if(token) {
-              // Actions for player 1
-              if (rightActionPlayer1.isActive()) {
-                player1.goRight();
-                host.sendDirection('R');
-              } else if (leftActionPlayer1.isActive()) {
-                player1.goLeft();
-                host.sendDirection('L');
-              } else if (upActionPlayer1.isActive()) {
-                player1.goUp();
-                host.sendDirection('U');
-              } else if (downActionPlayer1.isActive()) {
-                player1.goDown();
-                host.sendDirection('D');
-              }
-            } else {
-              // Actions for player 2
-              dir = host.receivedDirection();
-              if (dir=='R') {
-                player2.goRight();
-              }
-              else if (dir=='L') {
-                player2.goLeft();
-              }
-              else if (dir=='U') {
-                player2.goUp();
-              }
-              else if (dir=='D') {
-                player2.goDown();
-              }
-            }
-        } else {
-            if(!token){
-              dir=challenger.receivedDirection();
-              // Actions for player 1
-              if (dir=='R') {
-                player1.goRight();
-              }
-              else if (dir=='L') {
-                player1.goLeft();
-              }
-              else if (dir=='U') {
-                player1.goUp();
-              }
-              else if (dir=='D') {
-                player1.goDown();
-              }
-            } else {
-              // Actions for player 2
-              if (rightActionPlayer2.isActive()) {
-                player2.goRight();
-                challenger.sendDirection('R');
-              }
-              else if (leftActionPlayer2.isActive()) {
-                player2.goLeft();
-                challenger.sendDirection('L');
-              }
-              else if (upActionPlayer2.isActive()) {
-                player2.goUp();
-                challenger.sendDirection('U');
-              }
-              else if (downActionPlayer2.isActive()) {
-                player2.goDown();
-                challenger.sendDirection('D');
-              }
-            }
-        }
-        token = !token;
-
 
 
         gf::Time time = clock.restart();
@@ -302,6 +232,81 @@ int main(int argc, char *argv[]) {
         mainEntities.render(renderer);
 
         renderer.display();
+
+      if(status==0){
+        //if(token) {
+          // Actions for player 1
+          //while(token){
+            if (rightActionPlayer1.isActive()) {
+              player1.goRight();
+              host.sendDirection('R');
+              token=!token;
+            } else if (leftActionPlayer1.isActive()) {
+              player1.goLeft();
+              host.sendDirection('L');
+              token=!token;
+            } else if (upActionPlayer1.isActive()) {
+              player1.goUp();
+              host.sendDirection('U');
+              token=!token;
+            } else if (downActionPlayer1.isActive()) {
+              player1.goDown();
+              host.sendDirection('D');
+              token=!token;
+            }
+          //}
+      /*
+        // Actions for player 2
+        dir = host.receivedDirection();
+        if (dir=='R') {
+          player2.goRight();
+        }
+        else if (dir=='L') {
+          player2.goLeft();
+        }
+        else if (dir=='U') {
+          player2.goUp();
+        }
+        else if (dir=='D') {
+          player2.goDown();
+        }
+        */
+      } else {
+          dir = challenger.receivedDirection();
+          // Actions for player 1
+          if (dir == 'R') {
+            player1.goRight();
+          } else if (dir == 'L') {
+            player1.goLeft();
+          } else if (dir == 'U') {
+            player1.goUp();
+          } else if (dir == 'D') {
+            player1.goDown();
+          }/*
+        if (token) {
+          while(token){
+            // Actions for player 2
+            if (rightActionPlayer2.isActive()) {
+              player2.goRight();
+              challenger.sendDirection('R');
+              token=!token;
+            } else if (leftActionPlayer2.isActive()) {
+              player2.goLeft();
+              challenger.sendDirection('L');
+              token=!token;
+            } else if (upActionPlayer2.isActive()) {
+              player2.goUp();
+              challenger.sendDirection('U');
+              token=!token;
+            } else if (downActionPlayer2.isActive()) {
+              player2.goDown();
+              challenger.sendDirection('D');
+              token=!token;
+            }
+          }
+
+        }*/
+      }
 
         actions.reset();
     }
