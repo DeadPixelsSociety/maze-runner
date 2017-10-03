@@ -24,19 +24,6 @@ add_executable(maze-runner
         src/local/Player.cc
         src/local/Network.cc)
 
-
-#add_executable(maze-runner-host
-#    src/maze-runner-host.cc
-#    src/local/Map.cc
-#    src/local/Player.cc
-#    src/local/Network.cc)
-
-#add_executable(maze-runner-server
-#        src/maze-runner-server.cc
-#        src/local/Map.cc
-#        src/local/Player.cc
-#        src/local/Network.cc)
-
 target_include_directories(maze-runner
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src

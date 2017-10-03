@@ -208,6 +208,7 @@ int main(int argc, char *argv[]) {
         if(hisTurn) {
           // Actions for player 2
           dir = host.receivedDirection();
+          printf("%c\n",dir);
           if (dir == 'R') {
             player2.goRight();
           } else if (dir == 'L') {
@@ -222,6 +223,7 @@ int main(int argc, char *argv[]) {
       } else {
         if(hisTurn) {
           dir = challenger.receivedDirection();
+          printf("%c\n",dir);
           // Actions for player 1
           if (dir == 'R') {
             player1.goRight();
