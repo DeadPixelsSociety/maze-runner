@@ -40,13 +40,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     int status;
+    /*
     if(argv[1][1]=='s'){
-      //TODO recover error code
-        Server();
+        Host host;
         status=0;//0 = Server
     } else if (argv[1][1]=='c') {
-      //TODO recover error code
-        Client();
+        Challenger challenger;
         status=1;//1 = Client
     } else if (argv[1][1]=='h') {
         printf("Use -c for client\nUse -s for Server\n");
@@ -55,8 +54,18 @@ int main(int argc, char *argv[]) {
         printf("Use -c for client\nUse -s for Server\n");
         return 1;
     }
+    */
+    Host host;
+    Challenger challenger;
+    if(argv[1][1]=='s'){
+      host.createConnection();
+      status=0;//0 = Server
+    } else {
+      challenger.createConnection();
+      status=1;//1 = Client
+    }
 
-    // Create the window
+  // Create the window
     gf::Window window("Maze Runner", ScreenSize);
     gf::RenderWindow renderer(window);
     window.setVerticalSyncEnabled(true);
@@ -99,51 +108,101 @@ int main(int argc, char *argv[]) {
     closeWindowAction.addKeycodeKeyControl(gf::Keycode::Escape);
     actions.addAction(closeWindowAction);
 
-    // Actions for player 1
-    gf::Action leftActionPlayer1("Player 1 - Left");
-    leftActionPlayer1.addScancodeKeyControl(gf::Scancode::A);
-    // leftActionPlayer1.setContinuous(); // later
-    actions.addAction(leftActionPlayer1);
+  gf::Action leftActionPlayer1("Player 1 - Left");
+  gf::Action rightActionPlayer1("Player 1 - Right");
+  gf::Action upActionPlayer1("Player 1 - Up");
+  gf::Action downActionPlayer1("Player 1 - Down");
 
-    gf::Action rightActionPlayer1("Player 1 - Right");
-    rightActionPlayer1.addScancodeKeyControl(gf::Scancode::D);
-    // rightActionPlayer1.setContinuous(); // later
-    actions.addAction(rightActionPlayer1);
+  gf::Action leftActionPlayer2("Player 2 - Left");
+  gf::Action rightActionPlayer2("Player 2 - Right");
+  gf::Action upActionPlayer2("Player 2 - Up");
+  gf::Action downActionPlayer2("Player 2 - Down");
+    if(status==0) {
+      // Actions for player 1
 
-    gf::Action upActionPlayer1("Player 1 - Up");
-    upActionPlayer1.addScancodeKeyControl(gf::Scancode::W);
-    // upActionPlayer1.setContinuous(); // later
-    actions.addAction(upActionPlayer1);
+      leftActionPlayer1.addScancodeKeyControl(gf::Scancode::A);
+      // leftActionPlayer1.setContinuous(); // later
+      actions.addAction(leftActionPlayer1);
 
-    gf::Action downActionPlayer1("Player 1 - Down");
-    downActionPlayer1.addScancodeKeyControl(gf::Scancode::S);
-    // downActionPlayer1.setContinuous(); // later
-    actions.addAction(downActionPlayer1);
 
-    gf::Action leftActionPlayer2("Player 2 - Left");
-    leftActionPlayer2.addScancodeKeyControl(gf::Scancode::Left);
-    // leftActionPlayer2.setContinuous(); // later
-    actions.addAction(leftActionPlayer2);
+      rightActionPlayer1.addScancodeKeyControl(gf::Scancode::D);
+      // rightActionPlayer1.setContinuous(); // later
+      actions.addAction(rightActionPlayer1);
 
-    gf::Action rightActionPlayer2("Player 2 - Right");
-    rightActionPlayer2.addScancodeKeyControl(gf::Scancode::Right);
-    // rightActionPlayer2.setContinuous(); // later
-    actions.addAction(rightActionPlayer2);
 
-    gf::Action upActionPlayer2("Player 2 - Up");
-    upActionPlayer2.addScancodeKeyControl(gf::Scancode::Up);
-    // upActionPlayer2.setContinuous(); // later
-    actions.addAction(upActionPlayer2);
+      upActionPlayer1.addScancodeKeyControl(gf::Scancode::W);
+      // upActionPlayer1.setContinuous(); // later
+      actions.addAction(upActionPlayer1);
 
-    gf::Action downActionPlayer2("Player 2 - Down");
-    downActionPlayer2.addScancodeKeyControl(gf::Scancode::Down);
-    // downActionPlayer2.setContinuous(); // later
-    actions.addAction(downActionPlayer2);
 
+      downActionPlayer1.addScancodeKeyControl(gf::Scancode::S);
+      // downActionPlayer1.setContinuous(); // later
+      actions.addAction(downActionPlayer1);
+
+
+      leftActionPlayer2.addScancodeKeyControl(gf::Scancode::Left);
+      // leftActionPlayer2.setContinuous(); // later
+      actions.addAction(leftActionPlayer2);
+
+
+      rightActionPlayer2.addScancodeKeyControl(gf::Scancode::Right);
+      // rightActionPlayer2.setContinuous(); // later
+      actions.addAction(rightActionPlayer2);
+
+
+      upActionPlayer2.addScancodeKeyControl(gf::Scancode::Up);
+      // upActionPlayer2.setContinuous(); // later
+      actions.addAction(upActionPlayer2);
+
+
+      downActionPlayer2.addScancodeKeyControl(gf::Scancode::Down);
+      // downActionPlayer2.setContinuous(); // later
+      actions.addAction(downActionPlayer2);
+    } else {
+      // Actions for player 1
+      leftActionPlayer1.addScancodeKeyControl(gf::Scancode::Left);
+      // leftActionPlayer1.setContinuous(); // later
+      actions.addAction(leftActionPlayer1);
+
+      rightActionPlayer1.addScancodeKeyControl(gf::Scancode::Right);
+      // rightActionPlayer1.setContinuous(); // later
+      actions.addAction(rightActionPlayer1);
+
+      upActionPlayer1.addScancodeKeyControl(gf::Scancode::Up);
+      // upActionPlayer1.setContinuous(); // later
+      actions.addAction(upActionPlayer1);
+
+      downActionPlayer1.addScancodeKeyControl(gf::Scancode::Down);
+      // downActionPlayer1.setContinuous(); // later
+      actions.addAction(downActionPlayer1);
+
+      leftActionPlayer2.addScancodeKeyControl(gf::Scancode::A);
+      // leftActionPlayer2.setContinuous(); // later
+      actions.addAction(leftActionPlayer2);
+
+      rightActionPlayer2.addScancodeKeyControl(gf::Scancode::D);
+      // rightActionPlayer2.setContinuous(); // later
+      actions.addAction(rightActionPlayer2);
+
+      upActionPlayer2.addScancodeKeyControl(gf::Scancode::W);
+      // upActionPlayer2.setContinuous(); // later
+      actions.addAction(upActionPlayer2);
+
+      downActionPlayer2.addScancodeKeyControl(gf::Scancode::S);
+      // downActionPlayer2.setContinuous(); // later
+      actions.addAction(downActionPlayer2);
+    }
     // Game loop
     gf::Clock clock;
 
     renderer.clear(gf::Color::White);
+
+    bool token;
+    if(status==0){
+      token=true;
+    } else {
+      token=false;
+    }
 
     while (window.isOpen()) {
         // Input
@@ -158,73 +217,76 @@ int main(int argc, char *argv[]) {
         if (closeWindowAction.isActive()) {
             window.close();
         }
+
         if(status==0){
-          // Actions for player 1
-          if (rightActionPlayer1.isActive()) {
-            player1.goRight();
-            sendDirection(0,'R');
-          }
-          else if (leftActionPlayer1.isActive()) {
-            player1.goLeft();
-            sendDirection(0,'L');
-          }
-          else if (upActionPlayer1.isActive()) {
-            player1.goUp();
-            sendDirection(0,'U');
-          }
-          else if (downActionPlayer1.isActive()) {
-            player1.goDown();
-            sendDirection(0,'D');
-          }
-
-          // Actions for player 2
-          dir = receivedDirection(0);
-          if (dir=='R') {
-            player2.goRight();
-          }
-          else if (dir=='L') {
-            player2.goLeft();
-          }
-          else if (dir=='U') {
-            player2.goUp();
-          }
-          else if (dir=='D') {
-            player2.goDown();
-          }
+            if(token) {
+              // Actions for player 1
+              if (rightActionPlayer1.isActive()) {
+                player1.goRight();
+                host.sendDirection('R');
+              } else if (leftActionPlayer1.isActive()) {
+                player1.goLeft();
+                host.sendDirection('L');
+              } else if (upActionPlayer1.isActive()) {
+                player1.goUp();
+                host.sendDirection('U');
+              } else if (downActionPlayer1.isActive()) {
+                player1.goDown();
+                host.sendDirection('D');
+              }
+            } else {
+              // Actions for player 2
+              dir = host.receivedDirection();
+              if (dir=='R') {
+                player2.goRight();
+              }
+              else if (dir=='L') {
+                player2.goLeft();
+              }
+              else if (dir=='U') {
+                player2.goUp();
+              }
+              else if (dir=='D') {
+                player2.goDown();
+              }
+            }
         } else {
-          dir=receivedDirection(1);
-          // Actions for player 1
-          if (dir=='R') {
-            player1.goRight();
-          }
-          else if (dir=='L') {
-            player1.goLeft();
-          }
-          else if (dir=='U') {
-            player1.goUp();
-          }
-          else if (dir=='D') {
-            player1.goDown();
-          }
-
-          // Actions for player 2
-          if (rightActionPlayer2.isActive()) {
-            player2.goRight();
-            sendDirection(1,'R');
-          }
-          else if (leftActionPlayer2.isActive()) {
-            player2.goLeft();
-            sendDirection(1,'L');
-          }
-          else if (upActionPlayer2.isActive()) {
-            player2.goUp();
-            sendDirection(1,'U');
-          }
-          else if (downActionPlayer2.isActive()) {
-            player2.goDown();
-            sendDirection(1,'D');
-          }
+            if(!token){
+              dir=challenger.receivedDirection();
+              // Actions for player 1
+              if (dir=='R') {
+                player1.goRight();
+              }
+              else if (dir=='L') {
+                player1.goLeft();
+              }
+              else if (dir=='U') {
+                player1.goUp();
+              }
+              else if (dir=='D') {
+                player1.goDown();
+              }
+            } else {
+              // Actions for player 2
+              if (rightActionPlayer2.isActive()) {
+                player2.goRight();
+                challenger.sendDirection('R');
+              }
+              else if (leftActionPlayer2.isActive()) {
+                player2.goLeft();
+                challenger.sendDirection('L');
+              }
+              else if (upActionPlayer2.isActive()) {
+                player2.goUp();
+                challenger.sendDirection('U');
+              }
+              else if (downActionPlayer2.isActive()) {
+                player2.goDown();
+                challenger.sendDirection('D');
+              }
+            }
         }
+        token = !token;
 
 
 

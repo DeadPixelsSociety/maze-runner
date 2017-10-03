@@ -3,17 +3,27 @@
 
 #include <SFML/Network.hpp>
 
-sf::TcpListener listener;
-sf::TcpSocket server;
-sf::TcpSocket client;
-char data[2];
+class Host{
+private:
+  sf::TcpListener m_listener;
+  sf::TcpSocket m_server;
+  char m_data[2];
+public :
+  Host();
+  int sendDirection(char dir);
+  char receivedDirection();
+  void createConnection();
+};
 
-int Server();
-
-int Client();
-
-int sendDirection(int status, char dir);
-
-char receivedDirection(int status);
+class Challenger{
+private:
+  sf::TcpSocket m_client;
+  char m_data[2];
+public:
+  Challenger();
+  int sendDirection(char dir);
+  char receivedDirection();
+  void createConnection();
+};
 
 #endif //_NETWORK_LOCAL_H
