@@ -16,24 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MAP_LOCAL_H
-#define _MAP_LOCAL_H
+#include <gf/Singleton.h>
+#include <gf/ResourceManager.h>
 
-#include <gf/Entity.h>
-#include <gf/TileLayer.h>
+#ifndef _LOCAL_SINGLETONS_H
+#define _LOCAL_SINGLETONS_H
 
-class Map: public gf::Entity {
-public:
-    Map();
+extern gf::Singleton<gf::ResourceManager> gResourceManager;
 
-    virtual void update(gf::Time time) override;
-    virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
-
-private:
-    gf::Texture &m_floorTexture;
-    // gf::Texture &m_wallTexture;
-    gf::TileLayer m_layer;
-
-};
-
-#endif // _MAP_LOCAL_H
+#endif // _LOCAL_SINGLETONS_H
