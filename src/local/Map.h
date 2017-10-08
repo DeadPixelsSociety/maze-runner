@@ -30,6 +30,12 @@ public:
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
 private:
+    enum TileType : int {
+        Floor = 0,
+        Wall = 1,
+    };
+
+private:
     gf::Texture &m_tilesetTexture;
     gf::TileLayer m_layer;
 

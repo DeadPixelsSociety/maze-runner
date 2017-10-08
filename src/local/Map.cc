@@ -34,12 +34,11 @@ Map::Map() :
 
     for (unsigned col = 0; col < WorldBounds.width; ++col) {
         for (unsigned row = 0; row < WorldBounds.height; ++row) {
-            // if (row == WorldCenter.y && (col == 0 || col == WorldSize.width - 1)) {
             if (row == WorldCenter.y && col > 0 && col < WorldBounds.width - 1) {
-                m_layer.setTile({ col, row }, 0);
+                m_layer.setTile({ col, row }, TileType::Floor);
             }
             else {
-                m_layer.setTile({ col, row }, 1);
+                m_layer.setTile({ col, row }, TileType::Wall);
             }
         }
     }
