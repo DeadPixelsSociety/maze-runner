@@ -25,18 +25,24 @@
 
 Map::Map() :
     gf::Entity(10)
-    , m_floorTexture(gResourceManager().getTexture("floor.png"))
-    // , m_wallTexture(gResourceManager().getTexture("wall.png"))
+    , m_tilesetTexture(gResourceManager().getTexture("map_tileset.png"))
     , m_layer(WorldBounds) {
     // Init the layer
     m_layer.setTileSize({ 480, 480 });
     m_layer.setBlockSize({ static_cast<unsigned>(TileSize), static_cast<unsigned>(TileSize) });
-    m_layer.setTexture(m_floorTexture);
+    m_layer.setTexture(m_tilesetTexture);
 
-    m_layer.setTile({ 0, 0 }, 0);
-    m_layer.setTile({ 1, 0 }, 0);
-    m_layer.setTile({ 2, 0 }, 0);
-    m_layer.setTile({ 3, 0 }, 0);
+    for (unsigned col = 0; col < WorldBounds.width; ++col) {
+        for (unsigned row = 0; row < WorldBounds.height; ++row) {
+            // if (row == WorldCenter.y && (col == 0 || col == WorldSize.width - 1)) {
+            if (row == WorldCenter.y && col > 0 && col < WorldBounds.width - 1) {
+                m_layer.setTile({ col, row }, 0);
+            }
+            else {
+                m_layer.setTile({ col, row }, 1);
+            }
+        }
+    }
 }
 
 void Map::update(gf::Time time) {
@@ -44,13 +50,5 @@ void Map::update(gf::Time time) {
 }
 
 void Map::render(gf::RenderTarget &target, const gf::RenderStates &states) {
-    // gf::RectangleShape background;
-    // background.setSize(WorldSize);
-    // background.setPosition({ 0.0f, 0.0f });
-    // background.setColor(gf::Color::Black);
-
-    // target.draw(background, states);
-
-
     target.draw(m_layer, states);
 }

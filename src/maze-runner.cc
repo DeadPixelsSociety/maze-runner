@@ -53,11 +53,11 @@ int main() {
     gf::EntityContainer mainEntities;
 
     // Set the player 1
-    Player player1({ 0, WorldCenter.y });
+    Player player1(gf::Vector2i(1, WorldCenter.y));
     mainEntities.addEntity(player1);
 
     // Set the player 2
-    Player player2({ WorldBounds.x - 1, WorldCenter.y });
+    Player player2(gf::Vector2i(WorldBounds.x - 2, WorldCenter.y));
     mainEntities.addEntity(player2);
 
     // Set the map

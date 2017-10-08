@@ -30,8 +30,7 @@ public:
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
 private:
-    gf::Texture &m_floorTexture;
-    // gf::Texture &m_wallTexture;
+    gf::Texture &m_tilesetTexture;
     gf::TileLayer m_layer;
 
 };
