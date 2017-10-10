@@ -49,6 +49,8 @@ int main() {
     gf::SingletonStorage<gf::ResourceManager> storageForResourceManager(gResourceManager);
     gResourceManager().addSearchDir(MR_DATA_DIR);
 
+    gf::SingletonStorage<gf::MessageManager> storageForMessageManager(gMessageManager);
+
     // Initialization entities
     gf::EntityContainer mainEntities;
 
@@ -123,6 +125,11 @@ int main() {
     downActionPlayer2.addScancodeKeyControl(gf::Scancode::Down);
     // downActionPlayer2.setContinuous(); // later
     actions.addAction(downActionPlayer2);
+
+    // Dirty: set the initial turn
+    EndTurnMessage msg;
+    msg.player = &player2;
+    gMessageManager().sendMessage(&msg);
 
     // Game loop
     gf::Clock clock;

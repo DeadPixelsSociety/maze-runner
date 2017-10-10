@@ -24,17 +24,25 @@
 
 #include "Constants.h"
 #include "Player.h"
+#include "Singletons.h"
 
 Player::Player(const gf::Vector2i position) :
     gf::Entity(20)
     , m_position(position)
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
+    , m_isHisTurn(false)
     , m_timeElapsed(0.0f) {
-    // Constructor
+    // Register message handler
+    gMessageManager().registerHandler<EndTurnMessage>(&Player::onEndTurn, this);
 }
 
 void Player::goTo(const gf::Direction direction) {
+    // If is not his trun, we skip
+    if (!m_isHisTurn) {
+        return;
+    }
+
     m_wantsMove = true;
 
     switch (direction) {
@@ -56,8 +64,8 @@ void Player::goTo(const gf::Direction direction) {
 }
 
 void Player::update(gf::Time time) {
-    // Temporary
-    if (m_wantsMove == true) {
+    // If the player has his turn and he want move
+    if (m_wantsMove && m_isHisTurn) {
         switch (m_direction) {
         case gf::Direction::Up:
             m_position.y--;
@@ -75,7 +83,12 @@ void Player::update(gf::Time time) {
             assert(false);
         }
 
+        // End of turn
         m_wantsMove = false;
+        m_isHisTurn = false;
+        EndTurnMessage msg;
+        msg.player = this;
+        gMessageManager().sendMessage(&msg);
     }
 }
 
@@ -85,4 +98,17 @@ void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {
     circle.setPosition(m_position * TileSize);
 
     target.draw(circle, states);
+}
+
+gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
+    assert(id == EndTurnMessage::type);
+    EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
+
+    // If is not the current player
+    if (endTurn->player != this) {
+        m_timeElapsed = 0.0;
+        m_isHisTurn = true;
+    }
+
+    return gf::MessageStatus::Keep;
 }

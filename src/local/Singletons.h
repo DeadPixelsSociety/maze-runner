@@ -18,10 +18,12 @@
 
 #include <gf/Singleton.h>
 #include <gf/ResourceManager.h>
+#include <gf/MessageManager.h>
 
 #ifndef _LOCAL_SINGLETONS_H
 #define _LOCAL_SINGLETONS_H
 
 extern gf::Singleton<gf::ResourceManager> gResourceManager;
+extern gf::Singleton<gf::MessageManager> gMessageManager;
 
 #endif // _LOCAL_SINGLETONS_H

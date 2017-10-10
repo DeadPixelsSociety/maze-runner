@@ -16,32 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _PLAYER_LOCAL_H
-#define _PLAYER_LOCAL_H
+#ifndef _LOCAL_MESSAGES_H
+#define _LOCAL_MESSAGES_H
 
-#include <gf/Direction.h>
-#include <gf/Entity.h>
-#include <gf/Vector.h>
+#include <gf/Message.h>
 
-#include "Messages.h"
+class Player;
 
-class Player: public gf::Entity {
-public:
-    Player(const gf::Vector2i position);
+using namespace gf::literals;
 
-    void goTo(const gf::Direction direction);
-
-    virtual void update(gf::Time time) override;
-    virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
-
-    gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
-
-private:
-    gf::Vector2i m_position;
-    bool m_wantsMove;
-    gf::Direction m_direction;
-    bool m_isHisTurn;
-    float m_timeElapsed;
+struct EndTurnMessage : public gf::Message {
+    static const gf::Id type = "EndTurnMessage"_id; // compile-time definition
+    Player *player;
 };
 
-#endif // _PLAYER_LOCAL_H
+#endif // _LOCAL_MESSAGES_H
