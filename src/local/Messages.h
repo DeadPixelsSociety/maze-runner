@@ -19,6 +19,7 @@
 #ifndef _LOCAL_MESSAGES_H
 #define _LOCAL_MESSAGES_H
 
+#include <gf/Direction.h>
 #include <gf/Message.h>
 
 class Player;
@@ -28,6 +29,13 @@ using namespace gf::literals;
 struct EndTurnMessage : public gf::Message {
     static const gf::Id type = "EndTurnMessage"_id; // compile-time definition
     Player *player;
+};
+
+struct MovePlayerMessage : public gf::Message {
+    static const gf::Id type = "MovePlayerMessage"_id;
+    gf::Vector2i position;
+    gf::Direction direction;
+    bool isValid;
 };
 
 #endif // _LOCAL_MESSAGES_H

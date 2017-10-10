@@ -66,25 +66,22 @@ void Player::goTo(const gf::Direction direction) {
 void Player::update(gf::Time time) {
     // If the player has his turn and he want move
     if (m_wantsMove && m_isHisTurn) {
-        switch (m_direction) {
-        case gf::Direction::Up:
-            m_position.y--;
-            break;
-        case gf::Direction::Down:
-            m_position.y++;
-            break;
-        case gf::Direction::Right:
-            m_position.x++;
-            break;
-        case gf::Direction::Left:
-            m_position.x--;
-            break;
-        default:
-            assert(false);
-        }
+        // Send move
+        MovePlayerMessage move;
+        move.position = m_position;
+        move.direction = m_direction;
+        move.isValid = false;
+
+        gMessageManager().sendMessage(&move);
+
+        // Update position
+        m_position = move.position;
+        m_wantsMove = false;
 
         // End of turn
-        setEndTurn();
+        if (move.isValid) {
+            setEndTurn();
+        }
     }
     else if (m_isHisTurn) {
         m_timeElapsed += time.asSeconds();

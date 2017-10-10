@@ -37,17 +37,61 @@ Map::Map() :
             if (row == WorldCenter.y && col > 0 && col < WorldBounds.width - 1) {
                 m_layer.setTile({ col, row }, TileType::Floor);
             }
+            else if (row == WorldCenter.y - 1 && col > 0 && col < WorldBounds.width - 1) {
+                m_layer.setTile({ col, row }, TileType::Floor);
+            }
             else {
                 m_layer.setTile({ col, row }, TileType::Wall);
             }
         }
     }
+
+    // Register message handler
+    gMessageManager().registerHandler<MovePlayerMessage>(&Map::onMovePlayer, this);
 }
 
 void Map::update(gf::Time time) {
+    // gf::unused(time);
     // Nothing
 }
 
 void Map::render(gf::RenderTarget &target, const gf::RenderStates &states) {
     target.draw(m_layer, states);
+}
+
+gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
+    assert(id == MovePlayerMessage::type);
+    MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
+    move->isValid = false;
+
+    switch (move->direction) {
+    case gf::Direction::Up:
+        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y - 1)) == TileType::Floor) {
+            --move->position.y;
+            move->isValid = true;
+        }
+        break;
+    case gf::Direction::Down:
+        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y + 1)) == TileType::Floor) {
+            ++move->position.y;
+            move->isValid = true;
+        }
+        break;
+    case gf::Direction::Right:
+        if (m_layer.getTile(gf::Vector2u(move->position.x + 1, move->position.y)) == TileType::Floor) {
+            ++move->position.x;
+            move->isValid = true;
+        }
+        break;
+    case gf::Direction::Left:
+        if (m_layer.getTile(gf::Vector2u(move->position.x - 1, move->position.y)) == TileType::Floor) {
+            --move->position.x;
+            move->isValid = true;
+        }
+        break;
+    default:
+        assert(false);
+    }
+
+    return gf::MessageStatus::Keep;
 }
