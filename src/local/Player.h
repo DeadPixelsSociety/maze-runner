@@ -27,10 +27,7 @@ class Player: public gf::Entity {
 public:
     Player(const gf::Vector2i position);
 
-    void goUp();
-    void goDown();
-    void goRight();
-    void goLeft();
+    void goTo(const gf::Direction direction);
 
     virtual void update(gf::Time time) override;
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;

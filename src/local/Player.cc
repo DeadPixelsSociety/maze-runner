@@ -34,24 +34,25 @@ Player::Player(const gf::Vector2i position) :
     // Constructor
 }
 
-void Player::goUp() {
+void Player::goTo(const gf::Direction direction) {
     m_wantsMove = true;
-    m_direction = gf::Direction::Up;
-}
 
-void Player::goDown() {
-    m_wantsMove = true;
-    m_direction = gf::Direction::Down;
-}
-
-void Player::goRight() {
-    m_wantsMove = true;
-    m_direction = gf::Direction::Right;
-}
-
-void Player::goLeft() {
-    m_wantsMove = true;
-    m_direction = gf::Direction::Left;
+    switch (direction) {
+    case gf::Direction::Up:
+        m_direction = gf::Direction::Up;
+        break;
+    case gf::Direction::Down:
+        m_direction = gf::Direction::Down;
+        break;
+    case gf::Direction::Right:
+        m_direction = gf::Direction::Right;
+        break;
+    case gf::Direction::Left:
+        m_direction = gf::Direction::Left;
+        break;
+    default:
+        assert(false);
+    }
 }
 
 void Player::update(gf::Time time) {

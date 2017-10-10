@@ -144,30 +144,30 @@ int main() {
 
         // Actions for player 1
         if (rightActionPlayer1.isActive()) {
-            player1.goRight();
+            player1.goTo(gf::Direction::Right);
         }
         else if (leftActionPlayer1.isActive()) {
-            player1.goLeft();
+            player1.goTo(gf::Direction::Left);
         }
         else if (upActionPlayer1.isActive()) {
-            player1.goUp();
+            player1.goTo(gf::Direction::Up);
         }
         else if (downActionPlayer1.isActive()) {
-            player1.goDown();
+            player1.goTo(gf::Direction::Down);
         }
 
         // Actions for player 2
         if (rightActionPlayer2.isActive()) {
-            player2.goRight();
+            player2.goTo(gf::Direction::Right);
         }
         else if (leftActionPlayer2.isActive()) {
-            player2.goLeft();
+            player2.goTo(gf::Direction::Left);
         }
         else if (upActionPlayer2.isActive()) {
-            player2.goUp();
+            player2.goTo(gf::Direction::Up);
         }
         else if (downActionPlayer2.isActive()) {
-            player2.goDown();
+            player2.goTo(gf::Direction::Down);
         }
 
         gf::Time time = clock.restart();
