@@ -26,7 +26,6 @@
 #include <gf/ViewContainer.h>
 #include <gf/Views.h>
 #include <gf/Window.h>
-#include <sys/wait.h>
 
 #include "local/Constants.h"
 #include "local/Map.h"
@@ -143,7 +142,7 @@ int main(int argc, char *argv[]) {
 
     renderer.clear(gf::Color::White);
 
-    bool firstTime = true;
+    bool hostTurn = true;
 
     while (window.isOpen()) {
         // Input
@@ -160,103 +159,87 @@ int main(int argc, char *argv[]) {
         }
 
         if (status == 0) {
-            if(!firstTime){
+            printf("%s\n", hostTurn ? "my turn" : "challenger turn");
+            if(hostTurn){
+                printf("Waiting for input\n");
+                if (rightActionPlayer1.isActive()) {
+                    player1.goRight();
+                    hostTurn=false;
+                    host.sendDirection('R');
+                    printf("Sending Right\n");
+                } else if (leftActionPlayer1.isActive()) {
+                    player1.goLeft();
+                    hostTurn=false;
+                    host.sendDirection('L');
+                    printf("Sending Left\n");
+                } else if (upActionPlayer1.isActive()) {
+                    player1.goUp();
+                    hostTurn=false;
+                    host.sendDirection('U');
+                    printf("Sending Up\n");
+                } else if (downActionPlayer1.isActive()) {
+                    player1.goDown();
+                    hostTurn=false;
+                    host.sendDirection('D');
+                    printf("Sending Down\n");
+                }
+            } else {
                 printf("Waiting for opponent move\n");
                 dir = host.receivedDirection();
                 printf("%c\n", dir);
                 if (dir == 'R') {
                     player2.goRight();
+                    hostTurn=true;
                 } else if (dir == 'L') {
                     player2.goLeft();
+                    hostTurn=true;
                 } else if (dir == 'U') {
                     player2.goUp();
+                    hostTurn=true;
                 } else if (dir == 'D') {
                     player2.goDown();
-                }
-                printf("Waiting for input\n");
-                if (rightActionPlayer1.isActive()) {
-                    player1.goRight();
-                    host.sendDirection('R');
-                    printf("Sending Right\n");
-                } else if (leftActionPlayer1.isActive()) {
-                    player1.goLeft();
-                    host.sendDirection('L');
-                    printf("Sending Left\n");
-                } else if (upActionPlayer1.isActive()) {
-                    player1.goUp();
-                    host.sendDirection('U');
-                    printf("Sending Up\n");
-                } else if (downActionPlayer1.isActive()) {
-                    player1.goDown();
-                    host.sendDirection('D');
-                    printf("Sending Down\n");
-                }
-            } else {
-                printf("Waiting for input\n");
-                if (rightActionPlayer1.isActive()) {
-                    player1.goRight();
-                    host.sendDirection('R');
-                    firstTime = !firstTime;
-                    printf("Sending Right\n");
-                } else if (leftActionPlayer1.isActive()) {
-                    player1.goLeft();
-                    host.sendDirection('L');
-                    firstTime = !firstTime;
-                    printf("Sending Left\n");
-                } else if (upActionPlayer1.isActive()) {
-                    player1.goUp();
-                    host.sendDirection('U');
-                    firstTime = !firstTime;
-                    printf("Sending Up\n");
-                } else if (downActionPlayer1.isActive()) {
-                    player1.goDown();
-                    host.sendDirection('D');
-                    printf("Sending Down\n");
-                    firstTime = !firstTime;
+                    hostTurn=true;
                 }
             }
         } else {
-            if(!firstTime){
+            printf("%s\n", hostTurn ? "host turn" : "my turn");
+            if(hostTurn){
                 printf("Waiting for opponent move\n");
                 dir = challenger.receivedDirection();
                 printf("%c\n", dir);
                 // Actions for player 1
                 if (dir == 'R') {
                     player1.goRight();
+                    hostTurn=false;
                 } else if (dir == 'L') {
                     player1.goLeft();
+                    hostTurn=false;
                 } else if (dir == 'U') {
                     player1.goUp();
+                    hostTurn=false;
                 } else if (dir == 'D') {
                     player1.goDown();
+                    hostTurn=false;
                 }
             } else {
                 // Actions for player 2
+                printf("Waiting for input\n");
                 if (rightActionPlayer2.isActive()) {
                     player2.goRight();
+                    hostTurn=true;
                     challenger.sendDirection('R');
                 } else if (leftActionPlayer2.isActive()) {
                     player2.goLeft();
+                    hostTurn=true;
                     challenger.sendDirection('L');
                 } else if (upActionPlayer2.isActive()) {
                     player2.goUp();
+                    hostTurn=true;
                     challenger.sendDirection('U');
                 } else if (downActionPlayer2.isActive()) {
                     player2.goDown();
+                    hostTurn=true;
                     challenger.sendDirection('D');
-                }
-                printf("Waiting for opponent move\n");
-                dir = challenger.receivedDirection();
-                printf("%c\n", dir);
-                // Actions for player 1
-                if (dir == 'R') {
-                    player1.goRight();
-                } else if (dir == 'L') {
-                    player1.goLeft();
-                } else if (dir == 'U') {
-                    player1.goUp();
-                } else if (dir == 'D') {
-                    player1.goDown();
                 }
             }
         }
