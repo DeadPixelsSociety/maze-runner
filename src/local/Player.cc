@@ -84,11 +84,15 @@ void Player::update(gf::Time time) {
         }
 
         // End of turn
-        m_wantsMove = false;
-        m_isHisTurn = false;
-        EndTurnMessage msg;
-        msg.player = this;
-        gMessageManager().sendMessage(&msg);
+        setEndTurn();
+    }
+    else if (m_isHisTurn) {
+        m_timeElapsed += time.asSeconds();
+
+        if (m_timeElapsed >= TimeoutTurn) {
+            // End of turn
+            setEndTurn();
+        }
     }
 }
 
@@ -111,4 +115,13 @@ gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
     }
 
     return gf::MessageStatus::Keep;
+}
+
+void Player::setEndTurn() {
+    m_wantsMove = false;
+    m_isHisTurn = false;
+    m_timeElapsed = 0.0;
+    EndTurnMessage msg;
+    msg.player = this;
+    gMessageManager().sendMessage(&msg);
 }

@@ -37,6 +37,9 @@ public:
     gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
 
 private:
+    void setEndTurn();
+
+private:
     gf::Vector2i m_position;
     bool m_wantsMove;
     gf::Direction m_direction;
