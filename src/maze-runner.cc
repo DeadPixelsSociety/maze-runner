@@ -35,8 +35,8 @@
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Need one Parameter\n");
-        printf("Use -c for client\nUse -s for Server\n");
+        gf::Log::error("Need one Parameter\n");
+        gf::Log::error("Use -c for client\nUse -s for Server\n");
         return 1;
     }
     int status;
@@ -159,34 +159,34 @@ int main(int argc, char *argv[]) {
         }
 
         if (status == 0) {
-            printf("%s\n", hostTurn ? "my turn" : "challenger turn");
+            gf::Log::info("%s\n", hostTurn ? "my turn" : "challenger turn");
             if(hostTurn){
-                printf("Waiting for input\n");
+                gf::Log::info("Waiting for input\n");
                 if (rightActionPlayer1.isActive()) {
                     player1.goRight();
                     hostTurn=false;
                     host.sendDirection('R');
-                    printf("Sending Right\n");
+                    gf::Log::info("Sending Right\n");
                 } else if (leftActionPlayer1.isActive()) {
                     player1.goLeft();
                     hostTurn=false;
                     host.sendDirection('L');
-                    printf("Sending Left\n");
+                    gf::Log::info("Sending Left\n");
                 } else if (upActionPlayer1.isActive()) {
                     player1.goUp();
                     hostTurn=false;
                     host.sendDirection('U');
-                    printf("Sending Up\n");
+                    gf::Log::info("Sending Up\n");
                 } else if (downActionPlayer1.isActive()) {
                     player1.goDown();
                     hostTurn=false;
                     host.sendDirection('D');
-                    printf("Sending Down\n");
+                    gf::Log::info("Sending Down\n");
                 }
             } else {
-                printf("Waiting for opponent move\n");
+                gf::Log::info("Waiting for opponent move\n");
                 dir = host.receivedDirection();
-                printf("%c\n", dir);
+                gf::Log::info("%c\n", dir);
                 if (dir == 'R') {
                     player2.goRight();
                     hostTurn=true;
@@ -202,11 +202,11 @@ int main(int argc, char *argv[]) {
                 }
             }
         } else {
-            printf("%s\n", hostTurn ? "host turn" : "my turn");
+            gf::Log::info("%s\n", hostTurn ? "host turn" : "my turn");
             if(hostTurn){
-                printf("Waiting for opponent move\n");
+                gf::Log::info("Waiting for opponent move\n");
                 dir = challenger.receivedDirection();
-                printf("%c\n", dir);
+                gf::Log::info("%c\n", dir);
                 // Actions for player 1
                 if (dir == 'R') {
                     player1.goRight();
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
                 }
             } else {
                 // Actions for player 2
-                printf("Waiting for input\n");
+                gf::Log::info("Waiting for input\n");
                 if (rightActionPlayer2.isActive()) {
                     player2.goRight();
                     hostTurn=true;

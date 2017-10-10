@@ -19,6 +19,11 @@
 #ifndef _NETWORK_LOCAL_H
 #define _NETWORK_LOCAL_H
 
+#include <assert.h>
+#include <cstdio>
+
+#include <gf/Log.h>
+
 #include <SFML/Network.hpp>
 
 class Host{
