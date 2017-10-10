@@ -29,6 +29,7 @@
 #include <gf/Window.h>
 
 #include "local/Constants.h"
+#include "local/ControllerManager.h"
 #include "local/Map.h"
 #include "local/Player.h"
 #include "local/Singletons.h"
@@ -76,53 +77,63 @@ int main() {
     views.setInitialScreenSize(ScreenSize);
 
     // Add actions
-    gf::ActionContainer actions;
+    ControllerManager controller;
 
-    gf::Action closeWindowAction("Close window");
-    closeWindowAction.addCloseControl();
-    closeWindowAction.addKeycodeKeyControl(gf::Keycode::Escape);
-    actions.addAction(closeWindowAction);
+    // Close the window
+    ControlHandler closeWindowControl("Close window", [&window]{window.close();});
+    closeWindowControl.getAction().addCloseControl();
+    closeWindowControl.getAction().addKeycodeKeyControl(gf::Keycode::Escape);
+    controller.addControlHandler(closeWindowControl);
 
     // Actions for player 1
-    gf::Action leftActionPlayer1("Player 1 - Left");
-    leftActionPlayer1.addScancodeKeyControl(gf::Scancode::A);
-    // leftActionPlayer1.setContinuous(); // later
-    actions.addAction(leftActionPlayer1);
+    ControlHandler leftControlPlayer1("Player 1 - Left", [&player1]{
+        player1.goLeft();
+    });
+    leftControlPlayer1.getAction().addScancodeKeyControl(gf::Scancode::A);
+    controller.addControlHandler(leftControlPlayer1);
 
-    gf::Action rightActionPlayer1("Player 1 - Right");
-    rightActionPlayer1.addScancodeKeyControl(gf::Scancode::D);
-    // rightActionPlayer1.setContinuous(); // later
-    actions.addAction(rightActionPlayer1);
+    ControlHandler rightControlPlayer1("Player 1 - Right", [&player1]{
+        player1.goRight();
+    });
+    rightControlPlayer1.getAction().addScancodeKeyControl(gf::Scancode::D);
+    controller.addControlHandler(rightControlPlayer1);
 
-    gf::Action upActionPlayer1("Player 1 - Up");
-    upActionPlayer1.addScancodeKeyControl(gf::Scancode::W);
-    // upActionPlayer1.setContinuous(); // later
-    actions.addAction(upActionPlayer1);
+    ControlHandler upControlPlayer1("Player 1 - Up", [&player1]{
+        player1.goUp();
+    });
+    upControlPlayer1.getAction().addScancodeKeyControl(gf::Scancode::W);
+    controller.addControlHandler(upControlPlayer1);
 
-    gf::Action downActionPlayer1("Player 1 - Down");
-    downActionPlayer1.addScancodeKeyControl(gf::Scancode::S);
-    // downActionPlayer1.setContinuous(); // later
-    actions.addAction(downActionPlayer1);
+    ControlHandler downControlPlayer1("Player 1 - Down", [&player1]{
+        player1.goDown();
+    });
+    downControlPlayer1.getAction().addScancodeKeyControl(gf::Scancode::S);
+    controller.addControlHandler(downControlPlayer1);
 
-    gf::Action leftActionPlayer2("Player 2 - Left");
-    leftActionPlayer2.addScancodeKeyControl(gf::Scancode::Left);
-    // leftActionPlayer2.setContinuous(); // later
-    actions.addAction(leftActionPlayer2);
+    // Actions for player 2
+    ControlHandler leftControlPlayer2("Player 2 - Left", [&player2]{
+        player2.goLeft();
+    });
+    leftControlPlayer2.getAction().addScancodeKeyControl(gf::Scancode::Left);
+    controller.addControlHandler(leftControlPlayer2);
 
-    gf::Action rightActionPlayer2("Player 2 - Right");
-    rightActionPlayer2.addScancodeKeyControl(gf::Scancode::Right);
-    // rightActionPlayer2.setContinuous(); // later
-    actions.addAction(rightActionPlayer2);
+    ControlHandler rightControlPlayer2("Player 2 - Right", [&player2]{
+        player2.goRight();
+    });
+    rightControlPlayer2.getAction().addScancodeKeyControl(gf::Scancode::Right);
+    controller.addControlHandler(rightControlPlayer2);
 
-    gf::Action upActionPlayer2("Player 2 - Up");
-    upActionPlayer2.addScancodeKeyControl(gf::Scancode::Up);
-    // upActionPlayer2.setContinuous(); // later
-    actions.addAction(upActionPlayer2);
+    ControlHandler upControlPlayer2("Player 2 - Up", [&player2]{
+        player2.goUp();
+    });
+    upControlPlayer2.getAction().addScancodeKeyControl(gf::Scancode::Up);
+    controller.addControlHandler(upControlPlayer2);
 
-    gf::Action downActionPlayer2("Player 2 - Down");
-    downActionPlayer2.addScancodeKeyControl(gf::Scancode::Down);
-    // downActionPlayer2.setContinuous(); // later
-    actions.addAction(downActionPlayer2);
+    ControlHandler downControlPlayer2("Player 2 - Down", [&player2]{
+        player2.goDown();
+    });
+    downControlPlayer2.getAction().addScancodeKeyControl(gf::Scancode::Down);
+    controller.addControlHandler(downControlPlayer2);
 
     // Game loop
     gf::Clock clock;
@@ -133,42 +144,43 @@ int main() {
         // Input
         gf::Event event;
         while (window.pollEvent(event)) {
-            actions.processEvent(event);
+            controller.processEvent(event);
             views.processEvent(event);
         }
 
         // Actions
-        if (closeWindowAction.isActive()) {
-            window.close();
-        }
-
-        // Actions for player 1
-        if (rightActionPlayer1.isActive()) {
-            player1.goRight();
-        }
-        else if (leftActionPlayer1.isActive()) {
-            player1.goLeft();
-        }
-        else if (upActionPlayer1.isActive()) {
-            player1.goUp();
-        }
-        else if (downActionPlayer1.isActive()) {
-            player1.goDown();
-        }
-
-        // Actions for player 2
-        if (rightActionPlayer2.isActive()) {
-            player2.goRight();
-        }
-        else if (leftActionPlayer2.isActive()) {
-            player2.goLeft();
-        }
-        else if (upActionPlayer2.isActive()) {
-            player2.goUp();
-        }
-        else if (downActionPlayer2.isActive()) {
-            player2.goDown();
-        }
+        controller.processActions();
+        // if (closeWindowAction.isActive()) {
+        //     window.close();
+        // }
+        //
+        // // Actions for player 1
+        // if (rightActionPlayer1.isActive()) {
+        //     player1.goRight();
+        // }
+        // else if (leftActionPlayer1.isActive()) {
+        //     player1.goLeft();
+        // }
+        // else if (upActionPlayer1.isActive()) {
+        //     player1.goUp();
+        // }
+        // else if (downActionPlayer1.isActive()) {
+        //     player1.goDown();
+        // }
+        //
+        // // Actions for player 2
+        // if (rightActionPlayer2.isActive()) {
+        //     player2.goRight();
+        // }
+        // else if (leftActionPlayer2.isActive()) {
+        //     player2.goLeft();
+        // }
+        // else if (upActionPlayer2.isActive()) {
+        //     player2.goUp();
+        // }
+        // else if (downActionPlayer2.isActive()) {
+        //     player2.goDown();
+        // }
 
         gf::Time time = clock.restart();
 
@@ -183,7 +195,7 @@ int main() {
 
         renderer.display();
 
-        actions.reset();
+        controller.reset();
     }
 
     return 0;
