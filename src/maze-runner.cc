@@ -26,6 +26,7 @@
 #include <gf/ViewContainer.h>
 #include <gf/Views.h>
 #include <gf/Window.h>
+#include <sys/wait.h>
 
 #include "local/Constants.h"
 #include "local/Map.h"
@@ -34,7 +35,7 @@
 
 
 int main(int argc, char *argv[]) {
-    if(argc<2){
+    if (argc < 2) {
         printf("Need one Parameter\n");
         printf("Use -c for client\nUse -s for Server\n");
         return 1;
@@ -42,15 +43,15 @@ int main(int argc, char *argv[]) {
     int status;
     Host host;
     Challenger challenger;
-    if(argv[1][1]=='s'){
-      host.createConnection();
-      status=0;//0 = Server
-    } else if(argv[1][1]=='c') {
-      challenger.createConnection();
-      status=1;//1 = Client
+    if (argv[1][1] == 's') {
+        host.createConnection();
+        status = 0;//0 = Server
+    } else if (argv[1][1] == 'c') {
+        challenger.createConnection();
+        status = 1;//1 = Client
     }
 
-  // Create the window
+    // Create the window
     gf::Window window("Maze Runner", ScreenSize);
     gf::RenderWindow renderer(window);
     window.setVerticalSyncEnabled(true);
@@ -63,11 +64,11 @@ int main(int argc, char *argv[]) {
     gf::EntityContainer mainEntities;
 
     // Set the player 1
-    Player player1({ 0, WorldCenter.y });
+    Player player1({0, WorldCenter.y});
     mainEntities.addEntity(player1);
 
     // Set the player 2
-    Player player2({ WorldBounds.x - 1, WorldCenter.y });
+    Player player2({WorldBounds.x - 1, WorldCenter.y});
     mainEntities.addEntity(player2);
 
     // Set the map
@@ -79,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     gf::ExtendView mainView;
     mainView.setSize(WorldSize);
-    mainView.setCenter({ WorldSize.width * 0.5f, WorldSize.height * 0.5f });
+    mainView.setCenter({WorldSize.width * 0.5f, WorldSize.height * 0.5f});
     // mainView.setCenter(0.5f * WorldBounds); // Not compile, why?
     views.addView(mainView);
 
@@ -103,46 +104,46 @@ int main(int argc, char *argv[]) {
     gf::Action upActionPlayer2("Player 2 - Up");
     gf::Action downActionPlayer2("Player 2 - Down");
 
-    if(status==0) {
-      // Actions for player 1
-      leftActionPlayer1.addScancodeKeyControl(gf::Scancode::A);
-      // leftActionPlayer1.setContinuous(); // later
-      actions.addAction(leftActionPlayer1);
+    if (status == 0) {
+        // Actions for player 1
+        leftActionPlayer1.addScancodeKeyControl(gf::Scancode::A);
+        // leftActionPlayer1.setContinuous(); // later
+        actions.addAction(leftActionPlayer1);
 
-      rightActionPlayer1.addScancodeKeyControl(gf::Scancode::D);
-      // rightActionPlayer1.setContinuous(); // later
-      actions.addAction(rightActionPlayer1);
+        rightActionPlayer1.addScancodeKeyControl(gf::Scancode::D);
+        // rightActionPlayer1.setContinuous(); // later
+        actions.addAction(rightActionPlayer1);
 
-      upActionPlayer1.addScancodeKeyControl(gf::Scancode::W);
-      // upActionPlayer1.setContinuous(); // later
-      actions.addAction(upActionPlayer1);
+        upActionPlayer1.addScancodeKeyControl(gf::Scancode::W);
+        // upActionPlayer1.setContinuous(); // later
+        actions.addAction(upActionPlayer1);
 
-      downActionPlayer1.addScancodeKeyControl(gf::Scancode::S);
-      // downActionPlayer1.setContinuous(); // later
-      actions.addAction(downActionPlayer1);
+        downActionPlayer1.addScancodeKeyControl(gf::Scancode::S);
+        // downActionPlayer1.setContinuous(); // later
+        actions.addAction(downActionPlayer1);
     } else {
-      leftActionPlayer2.addScancodeKeyControl(gf::Scancode::A);
-      // leftActionPlayer2.setContinuous(); // later
-      actions.addAction(leftActionPlayer2);
+        leftActionPlayer2.addScancodeKeyControl(gf::Scancode::A);
+        // leftActionPlayer2.setContinuous(); // later
+        actions.addAction(leftActionPlayer2);
 
-      rightActionPlayer2.addScancodeKeyControl(gf::Scancode::D);
-      // rightActionPlayer2.setContinuous(); // later
-      actions.addAction(rightActionPlayer2);
+        rightActionPlayer2.addScancodeKeyControl(gf::Scancode::D);
+        // rightActionPlayer2.setContinuous(); // later
+        actions.addAction(rightActionPlayer2);
 
-      upActionPlayer2.addScancodeKeyControl(gf::Scancode::W);
-      // upActionPlayer2.setContinuous(); // later
-      actions.addAction(upActionPlayer2);
+        upActionPlayer2.addScancodeKeyControl(gf::Scancode::W);
+        // upActionPlayer2.setContinuous(); // later
+        actions.addAction(upActionPlayer2);
 
-      downActionPlayer2.addScancodeKeyControl(gf::Scancode::S);
-      // downActionPlayer2.setContinuous(); // later
-      actions.addAction(downActionPlayer2);
+        downActionPlayer2.addScancodeKeyControl(gf::Scancode::S);
+        // downActionPlayer2.setContinuous(); // later
+        actions.addAction(downActionPlayer2);
     }
     // Game loop
     gf::Clock clock;
 
     renderer.clear(gf::Color::White);
 
-    bool firstTime=true;
+    bool firstTime = true;
 
     while (window.isOpen()) {
         // Input
@@ -155,91 +156,125 @@ int main(int argc, char *argv[]) {
 
         // Actions
         if (closeWindowAction.isActive()) {
-          window.close();
-        }
-      
-      if(status==0){
-        while (firstTime) {
-          printf("Waiting for input\n");
-          if (rightActionPlayer1.isActive()) {
-            player1.goRight();
-            host.sendDirection('R');
-            firstTime = !firstTime;
-            printf("Sending Right\n");
-          } else if (leftActionPlayer1.isActive()) {
-            player1.goLeft();
-            host.sendDirection('L');
-            firstTime = !firstTime;
-            printf("Sending Left\n");
-          } else if (upActionPlayer1.isActive()) {
-            player1.goUp();
-            host.sendDirection('U');
-            firstTime = !firstTime;
-            printf("Sending Up\n");
-          } else if (downActionPlayer1.isActive()) {
-            player1.goDown();
-            host.sendDirection('D');
-            printf("Sending Down\n");
-            firstTime = !firstTime;
-          }
-        }
-        printf("Waiting for opponent move\n");
-        dir = host.receivedDirection();
-        printf("%c\n",dir);
-        if (dir == 'R') {
-          player2.goRight();
-        } else if (dir == 'L') {
-          player2.goLeft();
-        } else if (dir == 'U') {
-          player2.goUp();
-        } else if (dir == 'D') {
-          player2.goDown();
+            window.close();
         }
 
-      } else {
-        printf("Waiting for opponent move\n");
-        dir = challenger.receivedDirection();
-        printf("%c\n",dir);
-        // Actions for player 1
-        if (dir == 'R') {
-          player1.goRight();
-        } else if (dir == 'L') {
-          player1.goLeft();
-        } else if (dir == 'U') {
-          player1.goUp();
-        } else if (dir == 'D') {
-          player1.goDown();
+        if (status == 0) {
+            if(!firstTime){
+                printf("Waiting for opponent move\n");
+                dir = host.receivedDirection();
+                printf("%c\n", dir);
+                if (dir == 'R') {
+                    player2.goRight();
+                } else if (dir == 'L') {
+                    player2.goLeft();
+                } else if (dir == 'U') {
+                    player2.goUp();
+                } else if (dir == 'D') {
+                    player2.goDown();
+                }
+                printf("Waiting for input\n");
+                if (rightActionPlayer1.isActive()) {
+                    player1.goRight();
+                    host.sendDirection('R');
+                    printf("Sending Right\n");
+                } else if (leftActionPlayer1.isActive()) {
+                    player1.goLeft();
+                    host.sendDirection('L');
+                    printf("Sending Left\n");
+                } else if (upActionPlayer1.isActive()) {
+                    player1.goUp();
+                    host.sendDirection('U');
+                    printf("Sending Up\n");
+                } else if (downActionPlayer1.isActive()) {
+                    player1.goDown();
+                    host.sendDirection('D');
+                    printf("Sending Down\n");
+                }
+            } else {
+                printf("Waiting for input\n");
+                if (rightActionPlayer1.isActive()) {
+                    player1.goRight();
+                    host.sendDirection('R');
+                    firstTime = !firstTime;
+                    printf("Sending Right\n");
+                } else if (leftActionPlayer1.isActive()) {
+                    player1.goLeft();
+                    host.sendDirection('L');
+                    firstTime = !firstTime;
+                    printf("Sending Left\n");
+                } else if (upActionPlayer1.isActive()) {
+                    player1.goUp();
+                    host.sendDirection('U');
+                    firstTime = !firstTime;
+                    printf("Sending Up\n");
+                } else if (downActionPlayer1.isActive()) {
+                    player1.goDown();
+                    host.sendDirection('D');
+                    printf("Sending Down\n");
+                    firstTime = !firstTime;
+                }
+            }
+        } else {
+            if(!firstTime){
+                printf("Waiting for opponent move\n");
+                dir = challenger.receivedDirection();
+                printf("%c\n", dir);
+                // Actions for player 1
+                if (dir == 'R') {
+                    player1.goRight();
+                } else if (dir == 'L') {
+                    player1.goLeft();
+                } else if (dir == 'U') {
+                    player1.goUp();
+                } else if (dir == 'D') {
+                    player1.goDown();
+                }
+            } else {
+                // Actions for player 2
+                if (rightActionPlayer2.isActive()) {
+                    player2.goRight();
+                    challenger.sendDirection('R');
+                } else if (leftActionPlayer2.isActive()) {
+                    player2.goLeft();
+                    challenger.sendDirection('L');
+                } else if (upActionPlayer2.isActive()) {
+                    player2.goUp();
+                    challenger.sendDirection('U');
+                } else if (downActionPlayer2.isActive()) {
+                    player2.goDown();
+                    challenger.sendDirection('D');
+                }
+                printf("Waiting for opponent move\n");
+                dir = challenger.receivedDirection();
+                printf("%c\n", dir);
+                // Actions for player 1
+                if (dir == 'R') {
+                    player1.goRight();
+                } else if (dir == 'L') {
+                    player1.goLeft();
+                } else if (dir == 'U') {
+                    player1.goUp();
+                } else if (dir == 'D') {
+                    player1.goDown();
+                }
+            }
         }
-        // Actions for player 2
-        if (rightActionPlayer2.isActive()) {
-          player2.goRight();
-          challenger.sendDirection('R');
-        } else if (leftActionPlayer2.isActive()) {
-          player2.goLeft();
-          challenger.sendDirection('L');
-        } else if (upActionPlayer2.isActive()) {
-          player2.goUp();
-          challenger.sendDirection('U');
-        } else if (downActionPlayer2.isActive()) {
-          player2.goDown();
-          challenger.sendDirection('D');
-        }
-      }
 
-      gf::Time time = clock.restart();
+        gf::Time time = clock.restart();
 
-      // Update
-      mainEntities.update(time);
+        // Update
+        mainEntities.update(time);
 
-      // Render
-      renderer.clear();
+        // Render
+        renderer.clear();
 
-      renderer.setView(mainView);
-      mainEntities.render(renderer);
+        renderer.setView(mainView);
+        mainEntities.render(renderer);
 
-      renderer.display();
+        renderer.display();
 
-      actions.reset();
+        actions.reset();
     }
 
     return 0;
