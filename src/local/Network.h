@@ -46,7 +46,7 @@ public:
   Challenger();
   void sendDirection(char dir);
   char receivedDirection();
-  void createConnection();
+  void createConnection(std::string IPAddress);
 };
 
 #endif //_NETWORK_LOCAL_H

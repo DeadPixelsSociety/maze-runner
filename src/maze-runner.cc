@@ -50,7 +50,8 @@ int main(int argc, char *argv[]) {
         host.createConnection();
         status = 0;//0 = Server
     } else if (argv[1][1] == 'c') {
-        challenger.createConnection();
+        std::string IPAddress = argv[2];
+        challenger.createConnection(IPAddress);
         status = 1;//1 = Client
     }
 
@@ -174,6 +175,7 @@ int main(int argc, char *argv[]) {
         }
         if (status == 0) {
             //TODO change token base turn to time based turn with messages implementation like master
+            //TODO refactor to Player.Update maybe, to be cleaner ?
             gf::Log::info("%s\n", hostTurn ? "my turn" : "challenger turn");
             if(hostTurn){
                 gf::Log::info("Waiting for input\n");

@@ -77,9 +77,9 @@ char Challenger::receivedDirection(){
     return m_data[0];
 }
 
-void Challenger::createConnection() {
+void Challenger::createConnection(std::string IPAddress) {
     //TODO modify IP address
-    sf::Socket::Status status = m_client.connect("127.0.0.1", 9000);
+    sf::Socket::Status status = m_client.connect(IPAddress, 9000);
     if (status != sf::Socket::Done) {
         gf::Log::error("Server not found\n");
         assert(false);
