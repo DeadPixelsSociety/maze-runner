@@ -21,21 +21,77 @@
 
 #include "Constants.h"
 #include "Map.h"
+#include "Singletons.h"
 
 Map::Map() :
-    gf::Entity(10) {
-    // Nothing
+    gf::Entity(10)
+    , m_tilesetTexture(gResourceManager().getTexture("map_tileset.png"))
+    , m_layer(WorldBounds) {
+    // Init the layer
+    m_layer.setTileSize({ 480, 480 });
+    m_layer.setBlockSize({ static_cast<unsigned>(TileSize), static_cast<unsigned>(TileSize) });
+    m_layer.setTexture(m_tilesetTexture);
+
+    for (unsigned col = 0; col < WorldBounds.width; ++col) {
+        for (unsigned row = 0; row < WorldBounds.height; ++row) {
+            if (row == WorldCenter.y && col > 0 && col < WorldBounds.width - 1) {
+                m_layer.setTile({ col, row }, TileType::Floor);
+            }
+            else if (row == WorldCenter.y - 1 && col > 0 && col < WorldBounds.width - 1) {
+                m_layer.setTile({ col, row }, TileType::Floor);
+            }
+            else {
+                m_layer.setTile({ col, row }, TileType::Wall);
+            }
+        }
+    }
+
+    // Register message handler
+    gMessageManager().registerHandler<MovePlayerMessage>(&Map::onMovePlayer, this);
 }
 
 void Map::update(gf::Time time) {
+    // gf::unused(time);
     // Nothing
 }
 
 void Map::render(gf::RenderTarget &target, const gf::RenderStates &states) {
-    gf::RectangleShape background;
-    background.setSize(WorldSize);
-    background.setPosition({ 0.0f, 0.0f });
-    background.setColor(gf::Color::Black);
+    target.draw(m_layer, states);
+}
 
-    target.draw(background, states);
+gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
+    assert(id == MovePlayerMessage::type);
+    MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
+    move->isValid = false;
+
+    switch (move->direction) {
+    case gf::Direction::Up:
+        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y - 1)) == TileType::Floor) {
+            --move->position.y;
+            move->isValid = true;
+        }
+        break;
+    case gf::Direction::Down:
+        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y + 1)) == TileType::Floor) {
+            ++move->position.y;
+            move->isValid = true;
+        }
+        break;
+    case gf::Direction::Right:
+        if (m_layer.getTile(gf::Vector2u(move->position.x + 1, move->position.y)) == TileType::Floor) {
+            ++move->position.x;
+            move->isValid = true;
+        }
+        break;
+    case gf::Direction::Left:
+        if (m_layer.getTile(gf::Vector2u(move->position.x - 1, move->position.y)) == TileType::Floor) {
+            --move->position.x;
+            move->isValid = true;
+        }
+        break;
+    default:
+        assert(false);
+    }
+
+    return gf::MessageStatus::Keep;
 }

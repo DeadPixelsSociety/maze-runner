@@ -23,6 +23,7 @@
 #include <gf/Event.h>
 #include <gf/Log.h>
 #include <gf/RenderWindow.h>
+#include <gf/Singleton.h>
 #include <gf/ViewContainer.h>
 #include <gf/Views.h>
 #include <gf/Window.h>
@@ -31,6 +32,9 @@
 #include "local/Map.h"
 #include "local/Network.h"
 #include "local/Player.h"
+#include "local/Singletons.h"
+
+#include "config.h"
 
 
 int main(int argc, char *argv[]) {
@@ -59,15 +63,21 @@ int main(int argc, char *argv[]) {
     // Set level log
     gf::Log::setLevel(gf::Log::Debug);
 
+    // Set the singletons
+    gf::SingletonStorage<gf::ResourceManager> storageForResourceManager(gResourceManager);
+    gResourceManager().addSearchDir(MR_DATA_DIR);
+
+    gf::SingletonStorage<gf::MessageManager> storageForMessageManager(gMessageManager);
+
     // Initialization entities
     gf::EntityContainer mainEntities;
 
     // Set the player 1
-    Player player1({0, WorldCenter.y});
+    Player player1(gf::Vector2i(1, WorldCenter.y));
     mainEntities.addEntity(player1);
 
     // Set the player 2
-    Player player2({WorldBounds.x - 1, WorldCenter.y});
+    Player player2(gf::Vector2i(WorldBounds.x - 2, WorldCenter.y));
     mainEntities.addEntity(player2);
 
     // Set the map
@@ -137,6 +147,11 @@ int main(int argc, char *argv[]) {
         // downActionPlayer2.setContinuous(); // later
         actions.addAction(downActionPlayer2);
     }
+    // Dirty: set the initial turn
+    EndTurnMessage msg;
+    msg.player = &player2;
+    gMessageManager().sendMessage(&msg);
+
     // Game loop
     gf::Clock clock;
 
@@ -157,28 +172,28 @@ int main(int argc, char *argv[]) {
         if (closeWindowAction.isActive()) {
             window.close();
         }
-
         if (status == 0) {
+            //TODO change token base turn to time based turn with messages implementation like master
             gf::Log::info("%s\n", hostTurn ? "my turn" : "challenger turn");
             if(hostTurn){
                 gf::Log::info("Waiting for input\n");
                 if (rightActionPlayer1.isActive()) {
-                    player1.goRight();
+                    player1.goTo(gf::Direction::Right);
                     hostTurn=false;
                     host.sendDirection('R');
                     gf::Log::info("Sending Right\n");
                 } else if (leftActionPlayer1.isActive()) {
-                    player1.goLeft();
+                  player1.goTo(gf::Direction::Left);
                     hostTurn=false;
                     host.sendDirection('L');
                     gf::Log::info("Sending Left\n");
                 } else if (upActionPlayer1.isActive()) {
-                    player1.goUp();
+                  player1.goTo(gf::Direction::Up);
                     hostTurn=false;
                     host.sendDirection('U');
                     gf::Log::info("Sending Up\n");
                 } else if (downActionPlayer1.isActive()) {
-                    player1.goDown();
+                  player1.goTo(gf::Direction::Down);
                     hostTurn=false;
                     host.sendDirection('D');
                     gf::Log::info("Sending Down\n");
@@ -188,16 +203,16 @@ int main(int argc, char *argv[]) {
                 dir = host.receivedDirection();
                 gf::Log::info("%c\n", dir);
                 if (dir == 'R') {
-                    player2.goRight();
+                    player2.goTo(gf::Direction::Right);
                     hostTurn=true;
                 } else if (dir == 'L') {
-                    player2.goLeft();
+                    player2.goTo(gf::Direction::Left);
                     hostTurn=true;
                 } else if (dir == 'U') {
-                    player2.goUp();
+                    player2.goTo(gf::Direction::Up);
                     hostTurn=true;
                 } else if (dir == 'D') {
-                    player2.goDown();
+                    player2.goTo(gf::Direction::Down);
                     hostTurn=true;
                 }
             }
@@ -209,35 +224,35 @@ int main(int argc, char *argv[]) {
                 gf::Log::info("%c\n", dir);
                 // Actions for player 1
                 if (dir == 'R') {
-                    player1.goRight();
+                    player1.goTo(gf::Direction::Right);
                     hostTurn=false;
                 } else if (dir == 'L') {
-                    player1.goLeft();
+                    player1.goTo(gf::Direction::Left);
                     hostTurn=false;
                 } else if (dir == 'U') {
-                    player1.goUp();
+                    player1.goTo(gf::Direction::Up);
                     hostTurn=false;
                 } else if (dir == 'D') {
-                    player1.goDown();
+                    player1.goTo(gf::Direction::Down);
                     hostTurn=false;
                 }
             } else {
                 // Actions for player 2
                 gf::Log::info("Waiting for input\n");
                 if (rightActionPlayer2.isActive()) {
-                    player2.goRight();
+                    player2.goTo(gf::Direction::Right);
                     hostTurn=true;
                     challenger.sendDirection('R');
                 } else if (leftActionPlayer2.isActive()) {
-                    player2.goLeft();
+                    player2.goTo(gf::Direction::Left);
                     hostTurn=true;
                     challenger.sendDirection('L');
                 } else if (upActionPlayer2.isActive()) {
-                    player2.goUp();
+                    player2.goTo(gf::Direction::Up);
                     hostTurn=true;
                     challenger.sendDirection('U');
                 } else if (downActionPlayer2.isActive()) {
-                    player2.goDown();
+                    player2.goTo(gf::Direction::Down);
                     hostTurn=true;
                     challenger.sendDirection('D');
                 }

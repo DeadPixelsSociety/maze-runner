@@ -24,57 +24,72 @@
 
 #include "Constants.h"
 #include "Player.h"
+#include "Singletons.h"
 
 Player::Player(const gf::Vector2i position) :
     gf::Entity(20)
     , m_position(position)
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
+    , m_isHisTurn(false)
     , m_timeElapsed(0.0f) {
-    // Constructor
+    // Register message handler
+    gMessageManager().registerHandler<EndTurnMessage>(&Player::onEndTurn, this);
 }
 
-void Player::goUp() {
-    m_wantsMove = true;
-    m_direction = gf::Direction::Up;
-}
+void Player::goTo(const gf::Direction direction) {
+    // If is not his trun, we skip
+    if (!m_isHisTurn) {
+        return;
+    }
 
-void Player::goDown() {
     m_wantsMove = true;
-    m_direction = gf::Direction::Down;
-}
 
-void Player::goRight() {
-    m_wantsMove = true;
-    m_direction = gf::Direction::Right;
-}
-
-void Player::goLeft() {
-    m_wantsMove = true;
-    m_direction = gf::Direction::Left;
+    switch (direction) {
+    case gf::Direction::Up:
+        m_direction = gf::Direction::Up;
+        break;
+    case gf::Direction::Down:
+        m_direction = gf::Direction::Down;
+        break;
+    case gf::Direction::Right:
+        m_direction = gf::Direction::Right;
+        break;
+    case gf::Direction::Left:
+        m_direction = gf::Direction::Left;
+        break;
+    default:
+        assert(false);
+    }
 }
 
 void Player::update(gf::Time time) {
-    // Temporary
-    if (m_wantsMove == true) {
-        switch (m_direction) {
-        case gf::Direction::Up:
-            m_position.y--;
-            break;
-        case gf::Direction::Down:
-            m_position.y++;
-            break;
-        case gf::Direction::Right:
-            m_position.x++;
-            break;
-        case gf::Direction::Left:
-            m_position.x--;
-            break;
-        default:
-            assert(false);
-        }
+    // If the player has his turn and he want move
+    if (m_wantsMove && m_isHisTurn) {
+        // Send move
+        MovePlayerMessage move;
+        move.position = m_position;
+        move.direction = m_direction;
+        move.isValid = false;
 
+        gMessageManager().sendMessage(&move);
+
+        // Update position
+        m_position = move.position;
         m_wantsMove = false;
+
+        // End of turn
+        if (move.isValid) {
+            setEndTurn();
+        }
+    }
+    else if (m_isHisTurn) {
+        m_timeElapsed += time.asSeconds();
+
+        if (m_timeElapsed >= TimeoutTurn) {
+            // End of turn
+            setEndTurn();
+        }
     }
 }
 
@@ -84,4 +99,26 @@ void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {
     circle.setPosition(m_position * TileSize);
 
     target.draw(circle, states);
+}
+
+gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
+    assert(id == EndTurnMessage::type);
+    EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
+
+    // If is not the current player
+    if (endTurn->player != this) {
+        m_timeElapsed = 0.0;
+        m_isHisTurn = true;
+    }
+
+    return gf::MessageStatus::Keep;
+}
+
+void Player::setEndTurn() {
+    m_wantsMove = false;
+    m_isHisTurn = false;
+    m_timeElapsed = 0.0;
+    EndTurnMessage msg;
+    msg.player = this;
+    gMessageManager().sendMessage(&msg);
 }

@@ -16,9 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#include <gf/Singleton.h>
+#include <gf/ResourceManager.h>
+#include <gf/MessageManager.h>
 
-#define MR_DATA_DIR "@MR_DATA_DIR@"
+#ifndef _LOCAL_SINGLETONS_H
+#define _LOCAL_SINGLETONS_H
 
-#endif // CONFIG_H
+extern gf::Singleton<gf::ResourceManager> gResourceManager;
+extern gf::Singleton<gf::MessageManager> gMessageManager;
+
+#endif // _LOCAL_SINGLETONS_H

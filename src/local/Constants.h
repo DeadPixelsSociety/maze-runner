@@ -1,5 +1,5 @@
 /*
- * Run and Crawl - A student indie game
+ * Maze Runner - A student indie game
  * Copyright (C) 2017-2018 to authors see AUTHORS file
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,10 @@ static constexpr gf::Vector2i ScreenSize = { 1024, 768 };
 
 // Map constants
 static constexpr float TileSize = 100.0f; // pixel
-static constexpr gf::Vector2i WorldBounds = { 21, 21 }; // Number of tiles
-static constexpr gf::Vector2i WorldCenter = { 10, 10 }; // Tiles coordinates
+static constexpr gf::Vector2u WorldBounds = { 21, 21 }; // Number of tiles
+static constexpr gf::Vector2u WorldCenter = { 10, 10 }; // Tiles coordinates
 // static constexpr gf::Vector2f WorldSize = WorldBounds * TileSize; // pixel // Not compile, why?
 static constexpr gf::Vector2f WorldSize = { WorldBounds.data[0] * TileSize, WorldBounds.data[1] * TileSize }; // pixel // dirty
+static constexpr float TimeoutTurn = 3.0f; // Seconds
 
 #endif //_LOCAL_CONSTANTS_H

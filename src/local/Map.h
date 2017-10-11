@@ -20,6 +20,9 @@
 #define _MAP_LOCAL_H
 
 #include <gf/Entity.h>
+#include <gf/TileLayer.h>
+
+#include "Messages.h"
 
 class Map: public gf::Entity {
 public:
@@ -28,7 +31,18 @@ public:
     virtual void update(gf::Time time) override;
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
+    gf::MessageStatus onMovePlayer(gf::Id id, gf::Message *msg);
+
 private:
+    enum TileType : uint8_t {
+        Floor = 0,
+        Wall = 1,
+    };
+
+private:
+    gf::Texture &m_tilesetTexture;
+    gf::TileLayer m_layer;
+
 };
 
 #endif // _MAP_LOCAL_H

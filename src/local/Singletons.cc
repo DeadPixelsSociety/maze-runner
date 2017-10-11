@@ -16,9 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#include "Singletons.h"
 
-#define MR_DATA_DIR "@MR_DATA_DIR@"
-
-#endif // CONFIG_H
+gf::Singleton<gf::ResourceManager> gResourceManager;
+gf::Singleton<gf::MessageManager> gMessageManager;

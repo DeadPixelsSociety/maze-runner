@@ -23,22 +23,27 @@
 #include <gf/Entity.h>
 #include <gf/Vector.h>
 
+#include "Messages.h"
+
 class Player: public gf::Entity {
 public:
     Player(const gf::Vector2i position);
 
-    void goUp();
-    void goDown();
-    void goRight();
-    void goLeft();
+    void goTo(const gf::Direction direction);
 
     virtual void update(gf::Time time) override;
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
+
+    gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
+
+private:
+    void setEndTurn();
 
 private:
     gf::Vector2i m_position;
     bool m_wantsMove;
     gf::Direction m_direction;
+    bool m_isHisTurn;
     float m_timeElapsed;
 };
 
