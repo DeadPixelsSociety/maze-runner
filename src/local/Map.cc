@@ -32,19 +32,30 @@ Map::Map() :
     m_layer.setBlockSize({ static_cast<unsigned>(TileSize), static_cast<unsigned>(TileSize) });
     m_layer.setTexture(m_tilesetTexture);
 
-    for (unsigned col = 0; col < WorldBounds.width; ++col) {
+
+for (unsigned col = 0; col < WorldBounds.width; ++col) {
         for (unsigned row = 0; row < WorldBounds.height; ++row) {
-            if (row == WorldCenter.y && col > 0 && col < WorldBounds.width - 1) {
-                m_layer.setTile({ col, row }, TileType::Floor);
-            }
-            else if (row == WorldCenter.y - 1 && col > 0 && col < WorldBounds.width - 1) {
-                m_layer.setTile({ col, row }, TileType::Floor);
-            }
-            else {
+            if (row == WorldCenter.y -10 && col > 0 && col < WorldBounds.width ) {
+                m_layer.setTile({ col, row }, TileType::Wall);//drawing the horezental line 
+            }//top wall
+    		 else if (col == WorldCenter.y +18 && row > 0 && row < WorldBounds.height) {
                 m_layer.setTile({ col, row }, TileType::Wall);
+		 }  //right vertical wall
+			else if (col == WorldCenter.y -10 && row > 0 && row < WorldBounds.height) {
+                m_layer.setTile({ col, row }, TileType::Wall);
+		 } //left vertical wall
+			 else if (col == WorldCenter.y +4 && row > 0 && row < WorldBounds.height) {
+                m_layer.setTile({ col, row }, TileType::Wall);
+		 } //seperation between the two players
+			else if (row == WorldCenter.y +10 && col > 0 && col < WorldBounds.width) {
+                m_layer.setTile({ col, row }, TileType::Wall);
+		 } //bottom wall
+else {
+                m_layer.setTile({ col, row }, TileType::Floor);
             }
-        }
-    }
+		}
+	}
+
 
     // Register message handler
     gMessageManager().registerHandler<MovePlayerMessage>(&Map::onMovePlayer, this);
