@@ -43,6 +43,7 @@ private:
     gf::Vector2i m_position;
     bool m_wantsMove;
     gf::Direction m_direction;
+    gf::Direction m_sightDirection;
     bool m_isHisTurn;
     float m_timeElapsed;
 

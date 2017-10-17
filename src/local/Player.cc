@@ -37,6 +37,7 @@ Player::Player(const gf::Vector2i position) :
     , m_position(position)
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
+    , m_sightDirection(gf::Direction::Left)
     , m_isHisTurn(false)
     , m_timeElapsed(0.0f)
     , m_numPlayer(s_totalPlayers + 1)
@@ -67,9 +68,11 @@ void Player::goTo(const gf::Direction direction) {
         break;
     case gf::Direction::Right:
         m_direction = gf::Direction::Right;
+        m_sightDirection = gf::Direction::Right;
         break;
     case gf::Direction::Left:
         m_direction = gf::Direction::Left;
+        m_sightDirection = gf::Direction::Left;
         break;
     default:
         assert(false);
@@ -109,9 +112,17 @@ void Player::update(gf::Time time) {
 void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {
     gf::Sprite sprite;
     sprite.setTexture(m_playerTexture);
-    sprite.setScale({SpriteXScale, SpriteYScale});
-    gf::Vector2f coord(TileSize * m_position.x, TileSize * m_position.y);
+
+    gf::Vector2f coord(TileSize * m_position.x + TileSize * 0.5f, TileSize * m_position.y + TileSize * 0.5f);
     sprite.setPosition(coord);
+    sprite.setAnchor(gf::Anchor::Center);
+
+    if (m_sightDirection == gf::Direction::Right) {
+        sprite.setScale({-SpriteXScale, SpriteYScale});
+    }
+    else {
+        sprite.setScale({SpriteXScale, SpriteYScale});
+    }
 
     target.draw(sprite, states);
 }
