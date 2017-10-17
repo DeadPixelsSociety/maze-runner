@@ -19,12 +19,18 @@
 #include <cassert>
 
 #include <gf/Color.h>
-#include <gf/Shapes.h>
+#include <gf/Log.h>
+#include <gf/Sprite.h>
 #include <gf/RenderTarget.h>
 
 #include "Constants.h"
 #include "Player.h"
 #include "Singletons.h"
+
+uint8_t Player::s_totalPlayers = 0;
+
+static constexpr float SpriteXScale = TileSize / 121.0f;
+static constexpr float SpriteYScale = TileSize / 153.0f;
 
 Player::Player(const gf::Vector2i position) :
     gf::Entity(20)
@@ -32,9 +38,16 @@ Player::Player(const gf::Vector2i position) :
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
     , m_isHisTurn(false)
-    , m_timeElapsed(0.0f) {
+    , m_timeElapsed(0.0f)
+    , m_numPlayer(s_totalPlayers + 1)
+    , m_playerTexture(gResourceManager().getTexture("player" + std::to_string(m_numPlayer) + ".png")) {
     // Register message handler
     gMessageManager().registerHandler<EndTurnMessage>(&Player::onEndTurn, this);
+
+    // Inc the total of players
+    ++s_totalPlayers;
+
+    gf::Log::debug("Player #%d created\n", m_numPlayer);
 }
 
 void Player::goTo(const gf::Direction direction) {
@@ -94,11 +107,13 @@ void Player::update(gf::Time time) {
 }
 
 void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {
-    gf::CircleShape circle(50);
-    circle.setColor(gf::Color::Red);
-    circle.setPosition(m_position * TileSize);
+    gf::Sprite sprite;
+    sprite.setTexture(m_playerTexture);
+    sprite.setScale({SpriteXScale, SpriteYScale});
+    gf::Vector2f coord(TileSize * m_position.x, TileSize * m_position.y);
+    sprite.setPosition(coord);
 
-    target.draw(circle, states);
+    target.draw(sprite, states);
 }
 
 gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {

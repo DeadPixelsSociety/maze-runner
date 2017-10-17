@@ -45,6 +45,11 @@ private:
     gf::Direction m_direction;
     bool m_isHisTurn;
     float m_timeElapsed;
+
+    static uint8_t s_totalPlayers;
+    uint8_t m_numPlayer;
+
+    gf::Texture &m_playerTexture;
 };
 
 #endif // _PLAYER_LOCAL_H
