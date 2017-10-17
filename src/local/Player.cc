@@ -122,3 +122,7 @@ void Player::setEndTurn() {
     msg.player = this;
     gMessageManager().sendMessage(&msg);
 }
+
+bool Player::hisTurn(){
+  return m_isHisTurn;
+}

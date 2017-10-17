@@ -36,7 +36,7 @@ public:
 
     gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
 
-private:
+    bool hisTurn();
     void setEndTurn();
 
 private:

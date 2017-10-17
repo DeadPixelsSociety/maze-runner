@@ -22,7 +22,9 @@ add_executable(maze-runner
         src/local/Map.cc
         src/local/Player.cc
         src/local/Network.cc
-        src/local/Singletons.cc)
+        src/local/Singletons.cc
+        src/local/Constants.h
+        src/local/Messages.h)
 
 target_include_directories(maze-runner
     PRIVATE
