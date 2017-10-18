@@ -3,7 +3,6 @@ A simple "Run & Crawl" game !
 
 ## Required libraries
 - GF (https://github.com/GamedevFramework/gf)
-- SFML Audio
 
 ## Build & run
 ```
