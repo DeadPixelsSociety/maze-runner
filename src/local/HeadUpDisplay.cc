@@ -26,7 +26,8 @@
 
 HeadUpDisplay::HeadUpDisplay() :
     gf::Entity(30)
-    , m_font(gResourceManager().getFont("font.ttf")){
+    , m_font(gResourceManager().getFont("font.ttf"))
+    , m_currentPlayer(0) {
     // Register message handler
     gMessageManager().registerHandler<EndTurnMessage>(&HeadUpDisplay::onEndTurn, this);
 }
@@ -40,7 +41,6 @@ void HeadUpDisplay::render(gf::RenderTarget &target, const gf::RenderStates &sta
 
     gf::Text text;
     text.setFont(m_font);
-    text.setColor(gf::Color::Black);
     text.setOutlineColor(gf::Color::White);
     text.setOutlineThickness(2.0f);
     text.setCharacterSize(coordinates.getRelativeCharacterSize(0.05f));
@@ -52,16 +52,31 @@ void HeadUpDisplay::render(gf::RenderTarget &target, const gf::RenderStates &sta
     }
 
     text.setString("Next turn in " + std::to_string(seconds) + " sec");
-    text.setAnchor(gf::Anchor::TopLeft);
-    text.setPosition(coordinates.getRelativePoint({ 0.025f, 0.025f }));
+
+    switch (m_currentPlayer) {
+    case 1:
+        text.setColor(gf::Color::fromRgba32(0x8f, 0x0e, 0x01));
+        text.setAnchor(gf::Anchor::TopLeft);
+        text.setPosition(coordinates.getRelativePoint({ 0.025f, 0.025f }));
+        break;
+    case 2:
+        text.setColor(gf::Color::fromRgba32(0x00, 0x53, 0x8c));
+        text.setAnchor(gf::Anchor::TopRight);
+        text.setPosition(coordinates.getRelativePoint({ 0.975f, 0.025f }));
+        break;
+    default:
+        assert(false);
+    }
+
 
     target.draw(text, states);
 }
 
 gf::MessageStatus HeadUpDisplay::onEndTurn(gf::Id id, gf::Message *msg) {
     assert(id == EndTurnMessage::type);
-    // EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
+    EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
 
+    m_currentPlayer = endTurn->playerID;
     m_turnTime = gf::Time::zero();
 
     return gf::MessageStatus::Keep;

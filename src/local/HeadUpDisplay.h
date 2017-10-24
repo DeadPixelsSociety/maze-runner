@@ -37,6 +37,7 @@ public:
 private:
     gf::Font &m_font;
     gf::Time m_turnTime;
+    std::uint8_t m_currentPlayer;
 };
 
 #endif  // _HEAD_UP_DISPLAY_LOCAL_H
