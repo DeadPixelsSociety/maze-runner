@@ -49,8 +49,6 @@ Player::Player(const gf::Vector2i position, const gf::Direction sight) :
 
     // Inc the total of players
     ++s_totalPlayers;
-
-    gf::Log::debug("Player #%d created\n", m_numPlayer);
 }
 
 void Player::goTo(const gf::Direction direction) {
@@ -153,7 +151,7 @@ gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
     EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
 
     // If is not the current player
-    if (endTurn->player != this) {
+    if (endTurn->playerID == m_numPlayer) {
         m_timeElapsed = 0.0;
         m_isHisTurn = true;
     }
@@ -195,6 +193,6 @@ void Player::setEndTurn() {
     m_isHisTurn = false;
     m_timeElapsed = 0.0;
     EndTurnMessage msg;
-    msg.player = this;
+    msg.playerID = (m_numPlayer % Player::s_totalPlayers) + 1;
     gMessageManager().sendMessage(&msg);
 }

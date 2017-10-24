@@ -28,7 +28,7 @@ using namespace gf::literals;
 
 struct EndTurnMessage : public gf::Message {
     static const gf::Id type = "EndTurnMessage"_id; // compile-time definition
-    Player *player;
+    unsigned playerID; // ID of next player
 };
 
 struct MovePlayerMessage : public gf::Message {

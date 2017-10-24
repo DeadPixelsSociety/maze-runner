@@ -128,7 +128,7 @@ int main() {
 
     // Dirty: set the initial turn
     EndTurnMessage msg;
-    msg.player = &player2;
+    msg.playerID = 1;
     gMessageManager().sendMessage(&msg);
 
     // Game loop
