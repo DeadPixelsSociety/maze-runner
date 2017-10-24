@@ -35,6 +35,7 @@ public:
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
     gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
+    gf::MessageStatus onMovePlayer(gf::Id id, gf::Message *msg);
 
 private:
     void setEndTurn();

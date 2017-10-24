@@ -22,6 +22,7 @@
 #include <gf/Log.h>
 #include <gf/Sprite.h>
 #include <gf/RenderTarget.h>
+#include <gf/VectorOps.h>
 
 #include "Constants.h"
 #include "Player.h"
@@ -44,6 +45,7 @@ Player::Player(const gf::Vector2i position, const gf::Direction sight) :
     , m_playerTexture(gResourceManager().getTexture("player" + std::to_string(m_numPlayer) + ".png")) {
     // Register message handler
     gMessageManager().registerHandler<EndTurnMessage>(&Player::onEndTurn, this);
+    gMessageManager().registerHandler<MovePlayerMessage>(&Player::onMovePlayer, this);
 
     // Inc the total of players
     ++s_totalPlayers;
@@ -86,7 +88,7 @@ void Player::update(gf::Time time) {
         MovePlayerMessage move;
         move.position = m_position;
         move.direction = m_direction;
-        move.isValid = false;
+        move.isValid = true;
 
         gMessageManager().sendMessage(&move);
 
@@ -96,6 +98,25 @@ void Player::update(gf::Time time) {
 
         // End of turn
         if (move.isValid) {
+            // Process move
+            switch (m_direction) {
+            case gf::Direction::Up:
+                --m_position.y;
+                break;
+            case gf::Direction::Down:
+                ++m_position.y;
+                break;
+            case gf::Direction::Right:
+                ++m_position.x;
+                break;
+            case gf::Direction::Left:
+                --m_position.x;
+                break;
+            default:
+                assert(false);
+            }
+
+            // End of turn
             setEndTurn();
         }
     }
@@ -135,6 +156,35 @@ gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
     if (endTurn->player != this) {
         m_timeElapsed = 0.0;
         m_isHisTurn = true;
+    }
+
+    return gf::MessageStatus::Keep;
+}
+
+gf::MessageStatus Player::onMovePlayer(gf::Id id, gf::Message *msg) {
+    assert(id == MovePlayerMessage::type);
+    MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
+
+    // If the movement is already invalid, we don't check anything
+    if (!move->isValid) {
+        return gf::MessageStatus::Keep;
+    }
+
+    switch (move->direction) {
+    case gf::Direction::Up:
+        move->isValid = (gf::Vector2i(move->position.x, move->position.y - 1) != m_position);
+        break;
+    case gf::Direction::Down:
+        move->isValid = gf::Vector2i(move->position.x, move->position.y + 1) != m_position;
+        break;
+    case gf::Direction::Right:
+        move->isValid = gf::Vector2i(move->position.x + 1, move->position.y) != m_position;
+        break;
+    case gf::Direction::Left:
+        move->isValid = gf::Vector2i(move->position.x - 1, move->position.y) != m_position;
+        break;
+    default:
+        assert(false);
     }
 
     return gf::MessageStatus::Keep;
