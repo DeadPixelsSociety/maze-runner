@@ -40,7 +40,6 @@ Player::Player(const gf::Vector2i position, const gf::Direction sight) :
     , m_direction(gf::Direction::Left)
     , m_sightDirection(sight)
     , m_isHisTurn(false)
-    , m_timeElapsed(0.0f)
     , m_numPlayer(s_totalPlayers + 1)
     , m_playerTexture(gResourceManager().getTexture("player" + std::to_string(m_numPlayer) + ".png")) {
     // Register message handler
@@ -119,9 +118,9 @@ void Player::update(gf::Time time) {
         }
     }
     else if (m_isHisTurn) {
-        m_timeElapsed += time.asSeconds();
+        m_turnTime.addTo(time);
 
-        if (m_timeElapsed >= TimeoutTurn) {
+        if (m_turnTime >= TimeoutTurn) {
             // End of turn
             setEndTurn();
         }
@@ -152,7 +151,7 @@ gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
 
     // If is not the current player
     if (endTurn->playerID == m_numPlayer) {
-        m_timeElapsed = 0.0;
+        m_turnTime = gf::Time::zero();
         m_isHisTurn = true;
     }
 
@@ -191,7 +190,7 @@ gf::MessageStatus Player::onMovePlayer(gf::Id id, gf::Message *msg) {
 void Player::setEndTurn() {
     m_wantsMove = false;
     m_isHisTurn = false;
-    m_timeElapsed = 0.0;
+    m_turnTime = gf::Time::zero();
     EndTurnMessage msg;
     msg.playerID = (m_numPlayer % Player::s_totalPlayers) + 1;
     gMessageManager().sendMessage(&msg);

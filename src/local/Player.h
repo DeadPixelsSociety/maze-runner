@@ -46,7 +46,7 @@ private:
     gf::Direction m_direction;
     gf::Direction m_sightDirection;
     bool m_isHisTurn;
-    float m_timeElapsed;
+    gf::Time m_turnTime;
 
     static uint8_t s_totalPlayers;
     uint8_t m_numPlayer;
