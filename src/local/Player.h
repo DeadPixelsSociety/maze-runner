@@ -27,7 +27,7 @@
 
 class Player: public gf::Entity {
 public:
-    Player(const gf::Vector2i position);
+    Player(const gf::Vector2i position, const gf::Direction sight = gf::Direction::Left);
 
     void goTo(const gf::Direction direction);
 

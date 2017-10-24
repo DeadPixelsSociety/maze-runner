@@ -32,12 +32,12 @@ uint8_t Player::s_totalPlayers = 0;
 static constexpr float SpriteXScale = TileSize / 121.0f;
 static constexpr float SpriteYScale = TileSize / 153.0f;
 
-Player::Player(const gf::Vector2i position) :
+Player::Player(const gf::Vector2i position, const gf::Direction sight) :
     gf::Entity(20)
     , m_position(position)
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
-    , m_sightDirection(gf::Direction::Left)
+    , m_sightDirection(sight)
     , m_isHisTurn(false)
     , m_timeElapsed(0.0f)
     , m_numPlayer(s_totalPlayers + 1)
