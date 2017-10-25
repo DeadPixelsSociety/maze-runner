@@ -32,30 +32,33 @@ Map::Map() :
     m_layer.setBlockSize({ static_cast<unsigned>(TileSize), static_cast<unsigned>(TileSize) });
     m_layer.setTexture(m_tilesetTexture);
 
-
-for (unsigned col = 0; col < WorldBounds.width; ++col) {
+    for (unsigned col = 0; col < WorldBounds.width; ++col) {
         for (unsigned row = 0; row < WorldBounds.height; ++row) {
+            // Top wall
             if (row == WorldCenter.y -10 && col > 0 && col < WorldBounds.width ) {
-                m_layer.setTile({ col, row }, TileType::Wall);//drawing the horezental line 
-            }//top wall
-    		 else if (col == WorldCenter.y +18 && row > 0 && row < WorldBounds.height) {
+                m_layer.setTile({ col, row }, TileType::Wall); // Drawing the horezental line
+            }
+            // Right vertical wall
+            else if (col == WorldCenter.y +18 && row > 0 && row < WorldBounds.height) {
                 m_layer.setTile({ col, row }, TileType::Wall);
-		 }  //right vertical wall
-			else if (col == WorldCenter.y -10 && row > 0 && row < WorldBounds.height) {
+            }
+            // Left vertical wall
+            else if (col == WorldCenter.y -10 && row > 0 && row < WorldBounds.height) {
                 m_layer.setTile({ col, row }, TileType::Wall);
-		 } //left vertical wall
-			 else if (col == WorldCenter.y +4 && row > 0 && row < WorldBounds.height) {
+            }
+            // Seperation between the two players
+            else if (col == WorldCenter.y +4 && row > 0 && row < WorldBounds.height && row != WorldCenter.y) {
                 m_layer.setTile({ col, row }, TileType::Wall);
-		 } //seperation between the two players
-			else if (row == WorldCenter.y +10 && col > 0 && col < WorldBounds.width) {
+            }
+            // Bottom wall
+            else if (row == WorldCenter.y +10 && col > 0 && col < WorldBounds.width) {
                 m_layer.setTile({ col, row }, TileType::Wall);
-		 } //bottom wall
-else {
+            }
+            else {
                 m_layer.setTile({ col, row }, TileType::Floor);
             }
-		}
-	}
-
+        }
+    }
 
     // Register message handler
     gMessageManager().registerHandler<MovePlayerMessage>(&Map::onMovePlayer, this);
@@ -73,32 +76,24 @@ void Map::render(gf::RenderTarget &target, const gf::RenderStates &states) {
 gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
     assert(id == MovePlayerMessage::type);
     MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
-    move->isValid = false;
+
+    // If the movement is already invalid, we don't check anything
+    if (!move->isValid) {
+        return gf::MessageStatus::Keep;
+    }
 
     switch (move->direction) {
     case gf::Direction::Up:
-        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y - 1)) == TileType::Floor) {
-            --move->position.y;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x, move->position.y - 1)) == TileType::Floor;
         break;
     case gf::Direction::Down:
-        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y + 1)) == TileType::Floor) {
-            ++move->position.y;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x, move->position.y + 1)) == TileType::Floor;
         break;
     case gf::Direction::Right:
-        if (m_layer.getTile(gf::Vector2u(move->position.x + 1, move->position.y)) == TileType::Floor) {
-            ++move->position.x;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x + 1, move->position.y)) == TileType::Floor;
         break;
     case gf::Direction::Left:
-        if (m_layer.getTile(gf::Vector2u(move->position.x - 1, move->position.y)) == TileType::Floor) {
-            --move->position.x;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x - 1, move->position.y)) == TileType::Floor;
         break;
     default:
         assert(false);

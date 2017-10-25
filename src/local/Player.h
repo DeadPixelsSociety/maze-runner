@@ -27,7 +27,7 @@
 
 class Player: public gf::Entity {
 public:
-    Player(const gf::Vector2i position);
+    Player(const gf::Vector2i position, const gf::Direction sight = gf::Direction::Left);
 
     void goTo(const gf::Direction direction);
 
@@ -35,6 +35,7 @@ public:
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
     gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
+    gf::MessageStatus onMovePlayer(gf::Id id, gf::Message *msg);
 
 private:
     void setEndTurn();
@@ -45,7 +46,7 @@ private:
     gf::Direction m_direction;
     gf::Direction m_sightDirection;
     bool m_isHisTurn;
-    float m_timeElapsed;
+    gf::Time m_turnTime;
 
     static uint8_t s_totalPlayers;
     uint8_t m_numPlayer;

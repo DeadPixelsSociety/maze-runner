@@ -24,11 +24,13 @@
 #include <gf/Log.h>
 #include <gf/RenderWindow.h>
 #include <gf/Singleton.h>
+#include <gf/VectorOps.h>
 #include <gf/ViewContainer.h>
 #include <gf/Views.h>
 #include <gf/Window.h>
 
 #include "local/Constants.h"
+#include "local/HeadUpDisplay.h"
 #include "local/Map.h"
 #include "local/Player.h"
 #include "local/Singletons.h"
@@ -55,25 +57,32 @@ int main() {
     gf::EntityContainer mainEntities;
 
     // Set the player 1
-    Player player1(gf::Vector2i(1, WorldCenter.y));
+    Player player1(gf::Vector2i(1, WorldCenter.y), gf::Direction::Right);
     mainEntities.addEntity(player1);
 
     // Set the player 2
-    Player player2(gf::Vector2i(WorldBounds.x - 2, WorldCenter.y));
+    Player player2(gf::Vector2i(WorldBounds.x - 2, WorldCenter.y), gf::Direction::Left);
     mainEntities.addEntity(player2);
 
     // Set the map
     Map map;
     mainEntities.addEntity(map);
 
+    // Set HUD
+    gf::EntityContainer hudEntities;
+    HeadUpDisplay hud;
+    hudEntities.addEntity(hud);
+
     // Add cameras
     gf::ViewContainer views;
 
     gf::ExtendView mainView;
     mainView.setSize(WorldSize);
-    mainView.setCenter({ WorldSize.width * 0.5f, WorldSize.height * 0.5f });
-    // mainView.setCenter(0.5f * WorldBounds); // Not compile, why?
+    mainView.setCenter(0.5f * WorldSize);
     views.addView(mainView);
+
+    gf::ScreenView hudView;
+    views.addView(hudView);
 
     views.setInitialScreenSize(ScreenSize);
 
@@ -128,7 +137,7 @@ int main() {
 
     // Dirty: set the initial turn
     EndTurnMessage msg;
-    msg.player = &player2;
+    msg.playerID = 1;
     gMessageManager().sendMessage(&msg);
 
     // Game loop
@@ -181,12 +190,18 @@ int main() {
 
         // Update
         mainEntities.update(time);
+        hudEntities.update(time);
 
         // Render
         renderer.clear();
 
+        // Main view
         renderer.setView(mainView);
         mainEntities.render(renderer);
+
+        // HUD view
+        renderer.setView(hudView);
+        hudEntities.render(renderer);
 
         renderer.display();
 

@@ -16,26 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _LOCAL_MESSAGES_H
-#define _LOCAL_MESSAGES_H
+#ifndef _HEAD_UP_DISPLAY_LOCAL_H
+#define _HEAD_UP_DISPLAY_LOCAL_H
 
-#include <gf/Direction.h>
-#include <gf/Message.h>
+#include <gf/Entity.h>
+#include <gf/Font.h>
+#include <gf/Time.h>
 
-class Player;
+#include "Messages.h"
 
-using namespace gf::literals;
+class HeadUpDisplay: public gf::Entity {
+public:
+    HeadUpDisplay();
 
-struct EndTurnMessage : public gf::Message {
-    static const gf::Id type = "EndTurnMessage"_id; // compile-time definition
-    unsigned playerID; // ID of next player
+    virtual void update(gf::Time time) override;
+    virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
+
+    gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
+
+private:
+    gf::Font &m_font;
+    gf::Time m_turnTime;
+    std::uint8_t m_currentPlayer;
 };
 
-struct MovePlayerMessage : public gf::Message {
-    static const gf::Id type = "MovePlayerMessage"_id;
-    gf::Vector2i position;
-    gf::Direction direction;
-    bool isValid;
-};
-
-#endif // _LOCAL_MESSAGES_H
+#endif  // _HEAD_UP_DISPLAY_LOCAL_H

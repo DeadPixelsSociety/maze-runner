@@ -19,6 +19,7 @@
 #ifndef _LOCAL_CONSTANTS_H
 #define _LOCAL_CONSTANTS_H
 
+#include <gf/Time.h>
 #include <gf/Vector.h>
 
 static constexpr gf::Vector2i ScreenSize = { 1024, 768 };
@@ -26,9 +27,9 @@ static constexpr gf::Vector2i ScreenSize = { 1024, 768 };
 // Map constants
 static constexpr float TileSize = 100.0f; // pixel
 static constexpr gf::Vector2u WorldBounds = { 29, 21 }; // Number of tiles
-static constexpr gf::Vector2u WorldCenter = { 10, 10 }; // Tiles coordinates
+static constexpr gf::Vector2u WorldCenter = { 14, 10 }; // Tiles coordinates
 // static constexpr gf::Vector2f WorldSize = WorldBounds * TileSize; // pixel // Not compile, why?
 static constexpr gf::Vector2f WorldSize = { WorldBounds.data[0] * TileSize, WorldBounds.data[1] * TileSize }; // pixel // dirty
-static constexpr float TimeoutTurn = 3.0f; // Seconds
+static constexpr gf::Time TimeoutTurn = gf::seconds(3.0f); // Seconds
 
 #endif //_LOCAL_CONSTANTS_H
