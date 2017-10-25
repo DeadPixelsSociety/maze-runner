@@ -22,30 +22,33 @@
 #include <assert.h>
 #include <cstdio>
 
+#include <gf/Direction.h>
 #include <gf/Log.h>
 
 #include <SFML/Network.hpp>
+
+//TODO overwrite gf:Direction to Action ?
 
 class Host{
 private:
   sf::TcpListener m_listener;
   sf::TcpSocket m_server;
-  char m_data[2];
+  gf::Direction m_action;
 public :
   Host();
-  void sendDirection(char dir);
-  char receivedDirection();
+  void sendDirection(gf::Direction action);
+  gf::Direction receivedDirection();
   void createConnection();
 };
 
 class Challenger{
 private:
   sf::TcpSocket m_client;
-  char m_data[2];
+  gf::Direction m_action;
 public:
   Challenger();
-  void sendDirection(char dir);
-  char receivedDirection();
+  void sendDirection(gf::Direction action);
+  gf::Direction receivedDirection();
   void createConnection(std::string IPAddress);
 };
 

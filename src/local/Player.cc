@@ -38,7 +38,7 @@ Player::Player(const gf::Vector2i position) :
 }
 
 void Player::goTo(const gf::Direction direction) {
-    // If is not his trun, we skip
+    // If is not his turn, we skip
     if (!m_isHisTurn) {
         return;
     }

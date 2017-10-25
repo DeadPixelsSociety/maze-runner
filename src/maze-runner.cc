@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         gf::Log::error("Use -c for client\nUse -s for Server\n");
         return 1;
     }
-    int status;
+    size_t status=2;
     Host host;
     Challenger challenger;
     if (argv[1][1] == 's') {
@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
         challenger.createConnection(IPAddress);
         status = 1;//1 = Client
     }
+    assert(status != 2);
 
     // Create the window
     gf::Window window("Maze Runner", ScreenSize);
@@ -162,7 +163,6 @@ int main(int argc, char *argv[]) {
     while (window.isOpen()) {
         // Input
         gf::Event event;
-        char dir;
         while (window.pollEvent(event)) {
             actions.processEvent(event);
             views.processEvent(event);
@@ -181,36 +181,45 @@ int main(int argc, char *argv[]) {
                 if (rightActionPlayer1.isActive()) {
                     player1.goTo(gf::Direction::Right);
                     player1.setEndTurn();
-                    host.sendDirection('R');
+                    host.sendDirection(gf::Direction::Right);
                     gf::Log::info("Sending Right\n");
                 } else if (leftActionPlayer1.isActive()) {
-                  player1.goTo(gf::Direction::Left);
-                  player1.setEndTurn();
-                    host.sendDirection('L');
+                    player1.goTo(gf::Direction::Left);
+                    player1.setEndTurn();
+                    host.sendDirection(gf::Direction::Left);
                     gf::Log::info("Sending Left\n");
                 } else if (upActionPlayer1.isActive()) {
-                  player1.goTo(gf::Direction::Up);
-                  player1.setEndTurn();
-                    host.sendDirection('U');
+                    player1.goTo(gf::Direction::Up);
+                    player1.setEndTurn();
+                    host.sendDirection(gf::Direction::Up);
                     gf::Log::info("Sending Up\n");
                 } else if (downActionPlayer1.isActive()) {
-                  player1.goTo(gf::Direction::Down);
-                  player1.setEndTurn();
-                    host.sendDirection('D');
+                    player1.goTo(gf::Direction::Down);
+                    player1.setEndTurn();
+                    host.sendDirection(gf::Direction::Down);
                     gf::Log::info("Sending Down\n");
                 }
             } else {
                 gf::Log::info("Waiting for opponent move\n");
-                dir = host.receivedDirection();
-                gf::Log::info("%c\n", dir);
-                if (dir == 'R') {
+                switch (host.receivedDirection()) {
+                case gf::Direction::Right :
                     player2.goTo(gf::Direction::Right);
-                } else if (dir == 'L') {
+                    player2.setEndTurn();
+                    break;
+                case gf::Direction::Left :
                     player2.goTo(gf::Direction::Left);
-                } else if (dir == 'U') {
+                    player2.setEndTurn();
+                    break;
+                case gf::Direction::Up :
                     player2.goTo(gf::Direction::Up);
-                } else if (dir == 'D') {
+                    player2.setEndTurn();
+                    break;
+                case gf::Direction::Down :
                     player2.goTo(gf::Direction::Down);
+                    player2.setEndTurn();
+                    break;
+                default:
+                    assert(false);
                 }
             }
         } else {
@@ -220,34 +229,43 @@ int main(int argc, char *argv[]) {
                 //gf::Log::info("Waiting for input\n");
                 if (rightActionPlayer2.isActive()) {
                   player2.goTo(gf::Direction::Right);
-                  challenger.sendDirection('R');
+                  player2.setEndTurn();
+                  challenger.sendDirection(gf::Direction::Right);
                 } else if (leftActionPlayer2.isActive()) {
                   player2.goTo(gf::Direction::Left);
-                  challenger.sendDirection('L');
+                  player2.setEndTurn();
+                  challenger.sendDirection(gf::Direction::Left);
                 } else if (upActionPlayer2.isActive()) {
                   player2.goTo(gf::Direction::Up);
-                  challenger.sendDirection('U');
+                  player2.setEndTurn();
+                  challenger.sendDirection(gf::Direction::Up);
                 } else if (downActionPlayer2.isActive()) {
                   player2.goTo(gf::Direction::Down);
-                  challenger.sendDirection('D');
+                  player2.setEndTurn();
+                  challenger.sendDirection(gf::Direction::Down);
               }
             } else {
                 gf::Log::info("Waiting for opponent move\n");
-                dir = challenger.receivedDirection();
-                gf::Log::info("%c\n", dir);
                 // Actions for player 1
-                if (dir == 'R') {
-                  player1.goTo(gf::Direction::Right);
-                  player2.setEndTurn();
-                } else if (dir == 'L') {
-                  player1.goTo(gf::Direction::Left);
-                  player2.setEndTurn();
-                } else if (dir == 'U') {
-                  player1.goTo(gf::Direction::Up);
-                  player2.setEndTurn();
-                } else if (dir == 'D') {
-                  player1.goTo(gf::Direction::Down);
-                  player2.setEndTurn();
+                switch (challenger.receivedDirection()) {
+                case gf::Direction::Right :
+                    player1.goTo(gf::Direction::Right);
+                    player1.setEndTurn();
+                    break;
+                case gf::Direction::Left :
+                    player1.goTo(gf::Direction::Left);
+                    player1.setEndTurn();
+                    break;
+                case gf::Direction::Up :
+                    player1.goTo(gf::Direction::Up);
+                    player1.setEndTurn();
+                    break;
+                case gf::Direction::Down :
+                    player1.goTo(gf::Direction::Down);
+                    player1.setEndTurn();
+                    break;
+                default:
+                    assert(false);
                 }
             }
         }

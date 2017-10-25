@@ -39,20 +39,20 @@ void Host::createConnection(){
     gf::Log::info("A client has connected to the server\n");
 }
 
-void Host::sendDirection(char dir) {
-    m_data[0] = dir;
-    if (m_server.send(m_data, 2) != sf::Socket::Done) {
+void Host::sendDirection(gf::Direction action) {
+    m_action = action;
+    if (m_server.send(&m_action, 1) != sf::Socket::Done) {
         gf::Log::error("Data could not be sent\n");
         assert(false);
     }
 }
 
-char Host::receivedDirection(){
+gf::Direction Host::receivedDirection(){
     size_t received;
-    if (m_server.receive(m_data, 2, received) != sf::Socket::Done) {
+    if (m_server.receive(&m_action, 2, received) != sf::Socket::Done) {
         gf::Log::error("Data could not found\n");
     }
-    return m_data[0];
+    return m_action;
 }
 
 //################################CHALLENGER####################################
@@ -60,21 +60,21 @@ char Host::receivedDirection(){
 Challenger::Challenger() {
 }
 
-void Challenger::sendDirection(char dir) {
-    m_data[0] = dir;
-    if (m_client.send(m_data, 2) != sf::Socket::Done) {
+void Challenger::sendDirection(gf::Direction action) {
+    m_action = action;
+    if (m_client.send(&m_action, 1) != sf::Socket::Done) {
         gf::Log::error("Data could not be sent\n");
         assert(false);
     }
 }
 
-char Challenger::receivedDirection(){
+gf::Direction Challenger::receivedDirection(){
     size_t received;
-    if (m_client.receive(m_data, 2, received) != sf::Socket::Done) {
+    if (m_client.receive(&m_action, 1, received) != sf::Socket::Done) {
         gf::Log::error("Data could not found\n");
         assert(false);
     }
-    return m_data[0];
+    return m_action;
 }
 
 void Challenger::createConnection(std::string IPAddress) {
