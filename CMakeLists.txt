@@ -20,6 +20,7 @@ endif()
 add_executable(maze-runner
         src/maze-runner.cc
         src/local/Map.cc
+        src/local/HeadUpDisplay.cc
         src/local/Player.cc
         src/local/Network.cc
         src/local/Singletons.cc

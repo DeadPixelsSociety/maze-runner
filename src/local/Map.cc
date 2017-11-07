@@ -34,14 +34,28 @@ Map::Map() :
 
     for (unsigned col = 0; col < WorldBounds.width; ++col) {
         for (unsigned row = 0; row < WorldBounds.height; ++row) {
-            if (row == WorldCenter.y && col > 0 && col < WorldBounds.width - 1) {
-                m_layer.setTile({ col, row }, TileType::Floor);
+            // Top wall
+            if (row == WorldCenter.y -10 && col > 0 && col < WorldBounds.width ) {
+                m_layer.setTile({ col, row }, TileType::Wall); // Drawing the horezental line
             }
-            else if (row == WorldCenter.y - 1 && col > 0 && col < WorldBounds.width - 1) {
-                m_layer.setTile({ col, row }, TileType::Floor);
+            // Right vertical wall
+            else if (col == WorldCenter.y +18 && row > 0 && row < WorldBounds.height) {
+                m_layer.setTile({ col, row }, TileType::Wall);
+            }
+            // Left vertical wall
+            else if (col == WorldCenter.y -10 && row > 0 && row < WorldBounds.height) {
+                m_layer.setTile({ col, row }, TileType::Wall);
+            }
+            // Seperation between the two players
+            else if (col == WorldCenter.y +4 && row > 0 && row < WorldBounds.height && row != WorldCenter.y) {
+                m_layer.setTile({ col, row }, TileType::Wall);
+            }
+            // Bottom wall
+            else if (row == WorldCenter.y +10 && col > 0 && col < WorldBounds.width) {
+                m_layer.setTile({ col, row }, TileType::Wall);
             }
             else {
-                m_layer.setTile({ col, row }, TileType::Wall);
+                m_layer.setTile({ col, row }, TileType::Floor);
             }
         }
     }
@@ -62,32 +76,24 @@ void Map::render(gf::RenderTarget &target, const gf::RenderStates &states) {
 gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
     assert(id == MovePlayerMessage::type);
     MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
-    move->isValid = false;
+
+    // If the movement is already invalid, we don't check anything
+    if (!move->isValid) {
+        return gf::MessageStatus::Keep;
+    }
 
     switch (move->direction) {
     case gf::Direction::Up:
-        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y - 1)) == TileType::Floor) {
-            --move->position.y;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x, move->position.y - 1)) == TileType::Floor;
         break;
     case gf::Direction::Down:
-        if (m_layer.getTile(gf::Vector2u(move->position.x, move->position.y + 1)) == TileType::Floor) {
-            ++move->position.y;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x, move->position.y + 1)) == TileType::Floor;
         break;
     case gf::Direction::Right:
-        if (m_layer.getTile(gf::Vector2u(move->position.x + 1, move->position.y)) == TileType::Floor) {
-            ++move->position.x;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x + 1, move->position.y)) == TileType::Floor;
         break;
     case gf::Direction::Left:
-        if (m_layer.getTile(gf::Vector2u(move->position.x - 1, move->position.y)) == TileType::Floor) {
-            --move->position.x;
-            move->isValid = true;
-        }
+        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x - 1, move->position.y)) == TileType::Floor;
         break;
     default:
         assert(false);

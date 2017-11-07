@@ -19,22 +19,35 @@
 #include <cassert>
 
 #include <gf/Color.h>
-#include <gf/Shapes.h>
+#include <gf/Log.h>
+#include <gf/Sprite.h>
 #include <gf/RenderTarget.h>
+#include <gf/VectorOps.h>
 
 #include "Constants.h"
 #include "Player.h"
 #include "Singletons.h"
 
-Player::Player(const gf::Vector2i position) :
+uint8_t Player::s_totalPlayers = 0;
+
+static constexpr float SpriteXScale = TileSize / 121.0f;
+static constexpr float SpriteYScale = TileSize / 153.0f;
+
+Player::Player(const gf::Vector2i position, const gf::Direction sight) :
     gf::Entity(20)
     , m_position(position)
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
+    , m_sightDirection(sight)
     , m_isHisTurn(false)
-    , m_timeElapsed(0.0f) {
+    , m_numPlayer(s_totalPlayers + 1)
+    , m_playerTexture(gResourceManager().getTexture("player" + std::to_string(m_numPlayer) + ".png")) {
     // Register message handler
     gMessageManager().registerHandler<EndTurnMessage>(&Player::onEndTurn, this);
+    gMessageManager().registerHandler<MovePlayerMessage>(&Player::onMovePlayer, this);
+
+    // Inc the total of players
+    ++s_totalPlayers;
 }
 
 void Player::goTo(const gf::Direction direction) {
@@ -54,9 +67,11 @@ void Player::goTo(const gf::Direction direction) {
         break;
     case gf::Direction::Right:
         m_direction = gf::Direction::Right;
+        m_sightDirection = gf::Direction::Right;
         break;
     case gf::Direction::Left:
         m_direction = gf::Direction::Left;
+        m_sightDirection = gf::Direction::Left;
         break;
     default:
         assert(false);
@@ -70,7 +85,7 @@ void Player::update(gf::Time time) {
         MovePlayerMessage move;
         move.position = m_position;
         move.direction = m_direction;
-        move.isValid = false;
+        move.isValid = true;
 
         gMessageManager().sendMessage(&move);
 
@@ -80,13 +95,32 @@ void Player::update(gf::Time time) {
 
         // End of turn
         if (move.isValid) {
+            // Process move
+            switch (m_direction) {
+            case gf::Direction::Up:
+                --m_position.y;
+                break;
+            case gf::Direction::Down:
+                ++m_position.y;
+                break;
+            case gf::Direction::Right:
+                ++m_position.x;
+                break;
+            case gf::Direction::Left:
+                --m_position.x;
+                break;
+            default:
+                assert(false);
+            }
+
+            // End of turn
             setEndTurn();
         }
     }
     else if (m_isHisTurn) {
-        m_timeElapsed += time.asSeconds();
+        m_turnTime.addTo(time);
 
-        if (m_timeElapsed >= TimeoutTurn) {
+        if (m_turnTime >= TimeoutTurn) {
             // End of turn
             setEndTurn();
         }
@@ -94,11 +128,21 @@ void Player::update(gf::Time time) {
 }
 
 void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {
-    gf::CircleShape circle(50);
-    circle.setColor(gf::Color::Red);
-    circle.setPosition(m_position * TileSize);
+    gf::Sprite sprite;
+    sprite.setTexture(m_playerTexture);
 
-    target.draw(circle, states);
+    gf::Vector2f coord(TileSize * m_position.x + TileSize * 0.5f, TileSize * m_position.y + TileSize * 0.5f);
+    sprite.setPosition(coord);
+    sprite.setAnchor(gf::Anchor::Center);
+
+    if (m_sightDirection == gf::Direction::Right) {
+        sprite.setScale({-SpriteXScale, SpriteYScale});
+    }
+    else {
+        sprite.setScale({SpriteXScale, SpriteYScale});
+    }
+
+    target.draw(sprite, states);
 }
 
 gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
@@ -106,9 +150,38 @@ gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
     EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
 
     // If is not the current player
-    if (endTurn->player != this) {
-        m_timeElapsed = 0.0;
+    if (endTurn->playerID == m_numPlayer) {
+        m_turnTime = gf::Time::zero();
         m_isHisTurn = true;
+    }
+
+    return gf::MessageStatus::Keep;
+}
+
+gf::MessageStatus Player::onMovePlayer(gf::Id id, gf::Message *msg) {
+    assert(id == MovePlayerMessage::type);
+    MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
+
+    // If the movement is already invalid, we don't check anything
+    if (!move->isValid) {
+        return gf::MessageStatus::Keep;
+    }
+
+    switch (move->direction) {
+    case gf::Direction::Up:
+        move->isValid = (gf::Vector2i(move->position.x, move->position.y - 1) != m_position);
+        break;
+    case gf::Direction::Down:
+        move->isValid = gf::Vector2i(move->position.x, move->position.y + 1) != m_position;
+        break;
+    case gf::Direction::Right:
+        move->isValid = gf::Vector2i(move->position.x + 1, move->position.y) != m_position;
+        break;
+    case gf::Direction::Left:
+        move->isValid = gf::Vector2i(move->position.x - 1, move->position.y) != m_position;
+        break;
+    default:
+        assert(false);
     }
 
     return gf::MessageStatus::Keep;
@@ -117,9 +190,9 @@ gf::MessageStatus Player::onEndTurn(gf::Id id, gf::Message *msg) {
 void Player::setEndTurn() {
     m_wantsMove = false;
     m_isHisTurn = false;
-    m_timeElapsed = 0.0;
+    m_turnTime = gf::Time::zero();
     EndTurnMessage msg;
-    msg.player = this;
+    msg.playerID = (m_numPlayer % Player::s_totalPlayers) + 1;
     gMessageManager().sendMessage(&msg);
 }
 
