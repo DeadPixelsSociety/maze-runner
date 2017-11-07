@@ -26,8 +26,8 @@ static constexpr gf::Vector2i ScreenSize = { 1024, 768 };
 
 // Map constants
 static constexpr float TileSize = 100.0f; // pixel
-static constexpr gf::Vector2u WorldBounds = { 29, 21 }; // Number of tiles
-static constexpr gf::Vector2u WorldCenter = { 14, 10 }; // Tiles coordinates
+static constexpr gf::Vector2u WorldBounds = { 51, 51 }; // Number of tiles
+static constexpr gf::Vector2u WorldCenter = { 25, 25 }; // Tiles coordinates
 // static constexpr gf::Vector2f WorldSize = WorldBounds * TileSize; // pixel // Not compile, why?
 static constexpr gf::Vector2f WorldSize = { WorldBounds.data[0] * TileSize, WorldBounds.data[1] * TileSize }; // pixel // dirty
 static constexpr gf::Time TimeoutTurn = gf::seconds(3.0f); // Seconds

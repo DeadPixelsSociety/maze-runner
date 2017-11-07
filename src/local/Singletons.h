@@ -16,14 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gf/Singleton.h>
-#include <gf/ResourceManager.h>
 #include <gf/MessageManager.h>
+#include <gf/Random.h>
+#include <gf/ResourceManager.h>
+#include <gf/Singleton.h>
 
 #ifndef _LOCAL_SINGLETONS_H
 #define _LOCAL_SINGLETONS_H
 
 extern gf::Singleton<gf::ResourceManager> gResourceManager;
 extern gf::Singleton<gf::MessageManager> gMessageManager;
+extern gf::Singleton<gf::Random> gRandom;
 
 #endif // _LOCAL_SINGLETONS_H

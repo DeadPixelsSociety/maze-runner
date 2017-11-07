@@ -52,6 +52,7 @@ int main() {
     gResourceManager().addSearchDir(MR_DATA_DIR);
 
     gf::SingletonStorage<gf::MessageManager> storageForMessageManager(gMessageManager);
+    gf::SingletonStorage<gf::Random> storageForRandom(gRandom);
 
     // Initialization entities
     gf::EntityContainer mainEntities;

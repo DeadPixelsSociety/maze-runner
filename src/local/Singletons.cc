@@ -20,3 +20,4 @@
 
 gf::Singleton<gf::ResourceManager> gResourceManager;
 gf::Singleton<gf::MessageManager> gMessageManager;
+gf::Singleton<gf::Random> gRandom;

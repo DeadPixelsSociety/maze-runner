@@ -40,6 +40,9 @@ private:
     };
 
 private:
+    void generate();
+
+private:
     gf::Texture &m_tilesetTexture;
     gf::TileLayer m_layer;
 

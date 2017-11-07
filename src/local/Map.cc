@@ -18,10 +18,14 @@
 
 #include <gf/RenderTarget.h>
 #include <gf/Shapes.h>
+#include <gf/SpaceTree.h>
 
 #include "Constants.h"
 #include "Map.h"
 #include "Singletons.h"
+
+static constexpr int RoomMinSize = 5;
+static constexpr int RoomMaxSize = 9;
 
 Map::Map() :
     gf::Entity(10)
@@ -32,33 +36,7 @@ Map::Map() :
     m_layer.setBlockSize({ static_cast<unsigned>(TileSize), static_cast<unsigned>(TileSize) });
     m_layer.setTexture(m_tilesetTexture);
 
-    for (unsigned col = 0; col < WorldBounds.width; ++col) {
-        for (unsigned row = 0; row < WorldBounds.height; ++row) {
-            // Top wall
-            if (row == WorldCenter.y -10 && col > 0 && col < WorldBounds.width ) {
-                m_layer.setTile({ col, row }, TileType::Wall); // Drawing the horezental line
-            }
-            // Right vertical wall
-            else if (col == WorldCenter.y +18 && row > 0 && row < WorldBounds.height) {
-                m_layer.setTile({ col, row }, TileType::Wall);
-            }
-            // Left vertical wall
-            else if (col == WorldCenter.y -10 && row > 0 && row < WorldBounds.height) {
-                m_layer.setTile({ col, row }, TileType::Wall);
-            }
-            // Seperation between the two players
-            else if (col == WorldCenter.y +4 && row > 0 && row < WorldBounds.height && row != WorldCenter.y) {
-                m_layer.setTile({ col, row }, TileType::Wall);
-            }
-            // Bottom wall
-            else if (row == WorldCenter.y +10 && col > 0 && col < WorldBounds.width) {
-                m_layer.setTile({ col, row }, TileType::Wall);
-            }
-            else {
-                m_layer.setTile({ col, row }, TileType::Floor);
-            }
-        }
-    }
+    generate();
 
     // Register message handler
     gMessageManager().registerHandler<MovePlayerMessage>(&Map::onMovePlayer, this);
@@ -100,4 +78,47 @@ gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
     }
 
     return gf::MessageStatus::Keep;
+}
+
+void Map::generate() {
+    // Fill the map with wall
+    for (unsigned col = 0; col < WorldBounds.width; ++col) {
+        for (unsigned row = 0; row < WorldBounds.height; ++row) {
+            m_layer.setTile({ col, row }, TileType::Wall);
+        }
+    }
+
+    // Split the map into sub rect
+    gf::SpaceTree root(gf::RectI({ 1, 1 }, WorldBounds - 2));
+    root.splitRecursive(gRandom(), 8, { RoomMinSize, RoomMinSize }, { RoomMaxSize, RoomMaxSize });
+
+    // Create each rooms
+    root.traverseInvertedLevelOrder([this](const gf::SpaceTree& node) {
+        if (!node.isLeaf()) {
+            return true;
+        }
+
+        auto area = node.getArea();
+
+        // Random sub-rect (x, y) coordinates and (width, height) size
+        assert(RoomMinSize <= area.width);
+        int width = gRandom().computeUniformInteger(RoomMinSize - 2, area.width - 2);
+        assert(RoomMinSize <= area.height);
+        int height = gRandom().computeUniformInteger(RoomMinSize - 2, area.height - 2);
+        assert(1 <= area.width - width - 1);
+        int x = area.left + gRandom().computeUniformInteger(1, area.width - width - 1);
+        assert(1 <= area.height - height - 1);
+        int y = area.top + gRandom().computeUniformInteger(1, area.height - height - 1);
+
+        // Create the room
+        for (unsigned col = 0; col < static_cast<unsigned>(width); ++col) {
+            for (unsigned row = 0; row < static_cast<unsigned>(height); ++row) {
+                m_layer.setTile({ x + col, y + row }, TileType::Floor);
+            }
+        }
+
+        return true;
+    });
+
+
 }
