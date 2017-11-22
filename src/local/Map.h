@@ -20,6 +20,7 @@
 #define _MAP_LOCAL_H
 
 #include <gf/Entity.h>
+#include <gf/SpaceTree.h>
 #include <gf/TileLayer.h>
 
 #include "Messages.h"
@@ -41,10 +42,12 @@ private:
 
 private:
     void generate();
+    void createCorridor(const gf::SpaceTree *root);
 
 private:
     gf::Texture &m_tilesetTexture;
     gf::TileLayer m_layer;
+    int m_level;
 
 };
 

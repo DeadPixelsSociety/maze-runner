@@ -24,7 +24,7 @@
 #include "Map.h"
 #include "Singletons.h"
 
-static constexpr int RoomMinSize = 5;
+static constexpr int RoomMinSize = 6;
 static constexpr int RoomMaxSize = 9;
 
 Map::Map() :
@@ -89,7 +89,7 @@ void Map::generate() {
     }
 
     // Split the map into sub rect
-    gf::SpaceTree root(gf::RectI({ 1, 1 }, WorldBounds - 2));
+    gf::SpaceTree root(gf::RectI({ 0, 0 }, WorldBounds));
     root.splitRecursive(gRandom(), 8, { RoomMinSize, RoomMinSize }, { RoomMaxSize, RoomMaxSize });
 
     // Create each rooms
@@ -100,25 +100,127 @@ void Map::generate() {
 
         auto area = node.getArea();
 
-        // Random sub-rect (x, y) coordinates and (width, height) size
-        assert(RoomMinSize <= area.width);
-        int width = gRandom().computeUniformInteger(RoomMinSize - 2, area.width - 2);
-        assert(RoomMinSize <= area.height);
-        int height = gRandom().computeUniformInteger(RoomMinSize - 2, area.height - 2);
-        assert(1 <= area.width - width - 1);
-        int x = area.left + gRandom().computeUniformInteger(1, area.width - width - 1);
-        assert(1 <= area.height - height - 1);
-        int y = area.top + gRandom().computeUniformInteger(1, area.height - height - 1);
-
         // Create the room
-        for (unsigned col = 0; col < static_cast<unsigned>(width); ++col) {
-            for (unsigned row = 0; row < static_cast<unsigned>(height); ++row) {
-                m_layer.setTile({ x + col, y + row }, TileType::Floor);
+        for (unsigned col = 2; col < static_cast<unsigned>(area.width-2); ++col) {
+            for (unsigned row = 2; row < static_cast<unsigned>(area.height-2); ++row) {
+                m_layer.setTile({ area.left + col, area.top + row }, TileType::Floor);
             }
         }
 
         return true;
     });
 
+    // Create corridor
+    createCorridor(&root);
+}
 
+void Map::createCorridor(const gf::SpaceTree *root) {
+    assert(root != nullptr);
+
+    if (root->isLeaf()) {
+        gf::Log::debug("Leaf\n");
+    }
+    else if (root->getLeftChild()->isLeaf() && !root->getRightChild()->isLeaf()){
+        gf::Log::debug("Left Leaf\n");
+        return;
+    }
+    else if (!root->getLeftChild()->isLeaf() && root->getRightChild()->isLeaf()){
+        gf::Log::debug("Right Leaf\n");
+        return;
+    }
+    else if (root->getLeftChild()->isLeaf() && root->getRightChild()->isLeaf()) {
+        // if (!root->getLeftChild()->isLeaf()) {
+        //     createCorridor(root->getLeftChild());
+        //     return;
+        // }
+        // if (!root->getRightChild()->isLeaf()) {
+        //     createCorridor(root->getRightChild());
+        //     return;
+        // }
+
+        assert(root->getLeftChild()->isLeaf() && root->getRightChild()->isLeaf());
+
+        auto centerLeft = root->getLeftChild()->getArea().getCenter();
+        auto centerRight = root->getRightChild()->getArea().getCenter();
+
+        // Create horizontal corridor
+        if (centerRight.col != centerLeft.col) {
+            unsigned minCol = 0;
+            unsigned maxCol = 0;
+            assert(centerRight.row == centerLeft.row);
+            unsigned row = centerRight.row;
+
+            if (centerRight.col > centerLeft.col) {
+                minCol = centerLeft.col;
+                maxCol = centerRight.col;
+            }
+            else {
+                minCol = centerRight.col;
+                maxCol = centerLeft.col;
+            }
+
+            for (unsigned col = minCol; col <= maxCol; ++col) {
+                m_layer.setTile({ col, row }, TileType::Floor);
+            }
+        }
+        // Create vertical corridor
+        else {
+            unsigned minRow = 0;
+            unsigned maxRow = 0;
+            assert(centerRight.col == centerLeft.col);
+            unsigned col = centerRight.col;
+
+            if (centerRight.row > centerLeft.row) {
+                minRow = centerLeft.row;
+                maxRow = centerRight.row;
+            }
+            else {
+                minRow = centerRight.row;
+                maxRow = centerLeft.row;
+            }
+
+            for (unsigned row = minRow; row <= maxRow; ++row) {
+                m_layer.setTile({ col, row }, TileType::Floor);
+            }
+        }
+
+        // if (centerRight.col > centerLeft.col) {
+        //     colStart = centerLeft.col;
+        //     colEnd = centerRight.col;
+        // }
+        // else {
+        //     colStart = centerRight.col;
+        //     colEnd = centerLeft.col;
+        // }
+        //
+        // if (centerRight.row > centerLeft.row) {
+        //     rowStart = centerLeft.row;
+        //     rowEnd = centerRight.row;
+        // }
+        // else {
+        //     rowStart = centerRight.row;
+        //     rowEnd = centerLeft.row;
+        // }
+        //
+        // gf::Log::debug("col %u -> %u\n", colStart, colEnd);
+        // gf::Log::debug("row %u -> %u\n", rowStart, rowEnd);
+        //
+        // for (unsigned col = colStart; col <= colEnd; ++col) {
+        //     for (unsigned row = rowStart; row <= rowEnd; ++row) {
+        //         gf::Log::debug("dig\n");
+        //         m_layer.setTile({ col, row }, TileType::Floor);
+        //     }
+        // }
+        // gf::SpaceTree *father = root->getFather();
+        // assert(father != nullptr);
+        //
+        // // Create the corridor
+        // auto centerLeft = node.getArea().getCenter();
+        // auto centerLeft = node.getArea().getCenter();
+        // for (int col = 0; )
+        return;
+    }
+
+    createCorridor(root->getLeftChild());
+    createCorridor(root->getRightChild());
 }
