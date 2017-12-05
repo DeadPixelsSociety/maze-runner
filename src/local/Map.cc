@@ -92,8 +92,10 @@ void Map::generate() {
     gf::SpaceTree root(gf::RectI({ 0, 0 }, WorldBounds));
     root.splitRecursive(gRandom(), 8, { RoomMinSize, RoomMinSize }, { RoomMaxSize, RoomMaxSize });
 
+    std::vector<gf::Vector2i> roomCoordinates;
+
     // Create each rooms
-    root.traverseInvertedLevelOrder([this](const gf::SpaceTree& node) {
+    root.traverseInvertedLevelOrder([this, &roomCoordinates](const gf::SpaceTree& node) {
         if (!node.isLeaf()) {
             return true;
         }
@@ -107,120 +109,99 @@ void Map::generate() {
             }
         }
 
+        roomCoordinates.push_back(node.getArea().getCenter());
+
         return true;
     });
 
     // Create corridor
-    createCorridor(&root);
+    createCorridor(roomCoordinates);
+
+    // for (auto &room: roomCoordinates) {
+    //     gf::Log::debug("%d ; %d = %d\n", room.x, room.y, gf::euclideanLength(room));
+    // }
 }
 
-void Map::createCorridor(const gf::SpaceTree *root) {
-    assert(root != nullptr);
+void Map::createCorridor(std::vector<gf::Vector2i> &roomCoordinates) {
+    // Sort the rooms by position
+    // std::sort(roomCoordinates.begin(), roomCoordinates.end(), [](const gf::Vector2i &room1, const gf::Vector2i &room2){
+    //     auto result = gf::lessThan(room1, room2);
+    //
+    //     return result[0] || result[1];
+    //     // return lessThangf::euclideanLength(room1) < gf::euclideanLength(room2);
+    //     // return gf::euclideanLength(room1) < gf::euclideanLength(room2);
+    //
+    //     // return room1.x <= room2.x && room1.y <= room2.y;
+    // });
 
-    if (root->isLeaf()) {
-        gf::Log::debug("Leaf\n");
-    }
-    else if (root->getLeftChild()->isLeaf() && !root->getRightChild()->isLeaf()){
-        gf::Log::debug("Left Leaf\n");
-        return;
-    }
-    else if (!root->getLeftChild()->isLeaf() && root->getRightChild()->isLeaf()){
-        gf::Log::debug("Right Leaf\n");
-        return;
-    }
-    else if (root->getLeftChild()->isLeaf() && root->getRightChild()->isLeaf()) {
-        // if (!root->getLeftChild()->isLeaf()) {
-        //     createCorridor(root->getLeftChild());
-        //     return;
-        // }
-        // if (!root->getRightChild()->isLeaf()) {
-        //     createCorridor(root->getRightChild());
-        //     return;
-        // }
+    // Search the first room
+    unsigned indexTopLeftRoom = 0;
+    gf::Vector2i room1;
+    gf::Vector2i room2;
 
-        assert(root->getLeftChild()->isLeaf() && root->getRightChild()->isLeaf());
+    int colorChoice = 0;
 
-        auto centerLeft = root->getLeftChild()->getArea().getCenter();
-        auto centerRight = root->getRightChild()->getArea().getCenter();
-
-        // Create horizontal corridor
-        if (centerRight.col != centerLeft.col) {
-            unsigned minCol = 0;
-            unsigned maxCol = 0;
-            assert(centerRight.row == centerLeft.row);
-            unsigned row = centerRight.row;
-
-            if (centerRight.col > centerLeft.col) {
-                minCol = centerLeft.col;
-                maxCol = centerRight.col;
-            }
-            else {
-                minCol = centerRight.col;
-                maxCol = centerLeft.col;
-            }
-
-            for (unsigned col = minCol; col <= maxCol; ++col) {
-                m_layer.setTile({ col, row }, TileType::Floor);
+    do {
+        indexTopLeftRoom = 0;
+        for (unsigned i = 1; i < roomCoordinates.size(); ++i) {
+            if (gf::euclideanLength(roomCoordinates[i]) < gf::euclideanLength(roomCoordinates[indexTopLeftRoom])) {
+                indexTopLeftRoom = i;
             }
         }
-        // Create vertical corridor
+
+        // Store the first room
+        room1 = roomCoordinates[indexTopLeftRoom];
+        roomCoordinates.erase(roomCoordinates.begin() + indexTopLeftRoom);
+
+        // Search the second room
+        indexTopLeftRoom = 0;
+        for (unsigned i = 1; i < roomCoordinates.size(); ++i) {
+            if (roomCoordinates[i].x != room1.x && roomCoordinates[i].y != room1.y) {
+                continue;
+            }
+
+            if (gf::manhattanDistance(room1, roomCoordinates[i]) < gf::manhattanDistance(room1, roomCoordinates[indexTopLeftRoom])) {
+                indexTopLeftRoom = i;
+            }
+        }
+
+        // Store the second room
+        room2 = roomCoordinates[indexTopLeftRoom];
+        roomCoordinates.erase(roomCoordinates.begin() + indexTopLeftRoom);
+
+        gf::Log::debug("%d ; %d = %d\n", room1.x, room1.y, gf::euclideanDistance(room1, room2));
+        gf::Log::debug("%d ; %d = %d\n\n", room2.x, room2.y, gf::euclideanDistance(room2, room1));
+
+        int xStart = -1;
+        int xEnd = -1;
+        if (room1.x < room2.x) {
+            xStart = room1.x;
+            xEnd = room2.x;
+        }
         else {
-            unsigned minRow = 0;
-            unsigned maxRow = 0;
-            assert(centerRight.col == centerLeft.col);
-            unsigned col = centerRight.col;
-
-            if (centerRight.row > centerLeft.row) {
-                minRow = centerLeft.row;
-                maxRow = centerRight.row;
-            }
-            else {
-                minRow = centerRight.row;
-                maxRow = centerLeft.row;
-            }
-
-            for (unsigned row = minRow; row <= maxRow; ++row) {
-                m_layer.setTile({ col, row }, TileType::Floor);
-            }
+            xStart = room2.x;
+            xEnd = room1.x;
         }
 
-        // if (centerRight.col > centerLeft.col) {
-        //     colStart = centerLeft.col;
-        //     colEnd = centerRight.col;
-        // }
-        // else {
-        //     colStart = centerRight.col;
-        //     colEnd = centerLeft.col;
-        // }
-        //
-        // if (centerRight.row > centerLeft.row) {
-        //     rowStart = centerLeft.row;
-        //     rowEnd = centerRight.row;
-        // }
-        // else {
-        //     rowStart = centerRight.row;
-        //     rowEnd = centerLeft.row;
-        // }
-        //
-        // gf::Log::debug("col %u -> %u\n", colStart, colEnd);
-        // gf::Log::debug("row %u -> %u\n", rowStart, rowEnd);
-        //
-        // for (unsigned col = colStart; col <= colEnd; ++col) {
-        //     for (unsigned row = rowStart; row <= rowEnd; ++row) {
-        //         gf::Log::debug("dig\n");
-        //         m_layer.setTile({ col, row }, TileType::Floor);
-        //     }
-        // }
-        // gf::SpaceTree *father = root->getFather();
-        // assert(father != nullptr);
-        //
-        // // Create the corridor
-        // auto centerLeft = node.getArea().getCenter();
-        // auto centerLeft = node.getArea().getCenter();
-        // for (int col = 0; )
-        return;
-    }
+        int yStart = -1;
+        int yEnd = -1;
+        if (room1.y < room2.y) {
+            yStart = room1.y;
+            yEnd = room2.y;
+        }
+        else {
+            yStart = room2.y;
+            yEnd = room1.y;
+        }
 
-    createCorridor(root->getLeftChild());
-    createCorridor(root->getRightChild());
+        for (int x = xStart; x <= xEnd; ++x) {
+            m_layer.setTile({ x, yStart }, TileType::DebugRed + colorChoice);
+        }
+
+        for (int y = yStart; y <= yEnd; ++y) {
+            m_layer.setTile({ xEnd, y }, TileType::DebugRed + colorChoice);
+        }
+
+        colorChoice = (colorChoice + 1) % 5;
+    } while (roomCoordinates.size() > 1);
 }

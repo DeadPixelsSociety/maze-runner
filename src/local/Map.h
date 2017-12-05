@@ -22,6 +22,7 @@
 #include <gf/Entity.h>
 #include <gf/SpaceTree.h>
 #include <gf/TileLayer.h>
+#include <gf/VectorOps.h>
 
 #include "Messages.h"
 
@@ -38,11 +39,16 @@ private:
     enum TileType : uint8_t {
         Floor = 0,
         Wall = 1,
+        DebugRed = 2,
+        DebugDark = 3,
+        DebugYellow = 4,
+        DebugBlue = 5,
+        DebugWhite = 6,
     };
 
 private:
     void generate();
-    void createCorridor(const gf::SpaceTree *root);
+    void createCorridor(std::vector<gf::Vector2i> &roomCoordinates);
 
 private:
     gf::Texture &m_tilesetTexture;
