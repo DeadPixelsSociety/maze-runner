@@ -116,92 +116,64 @@ void Map::generate() {
 
     // Create corridor
     createCorridor(roomCoordinates);
-
-    // for (auto &room: roomCoordinates) {
-    //     gf::Log::debug("%d ; %d = %d\n", room.x, room.y, gf::euclideanLength(room));
-    // }
 }
 
 void Map::createCorridor(std::vector<gf::Vector2i> &roomCoordinates) {
-    // Sort the rooms by position
-    // std::sort(roomCoordinates.begin(), roomCoordinates.end(), [](const gf::Vector2i &room1, const gf::Vector2i &room2){
-    //     auto result = gf::lessThan(room1, room2);
-    //
-    //     return result[0] || result[1];
-    //     // return lessThangf::euclideanLength(room1) < gf::euclideanLength(room2);
-    //     // return gf::euclideanLength(room1) < gf::euclideanLength(room2);
-    //
-    //     // return room1.x <= room2.x && room1.y <= room2.y;
-    // });
-
-    // Search the first room
-    unsigned indexTopLeftRoom = 0;
+    // Init the structure
     gf::Vector2i room1;
     gf::Vector2i room2;
+    std::vector<gf::Vector2i> alreadyConnectedRooms;
 
-    int colorChoice = 0;
+    // Pick the first connected room
+    int index = gRandom().computeUniformInteger<unsigned>(0, roomCoordinates.size() - 1);
+    alreadyConnectedRooms.push_back(roomCoordinates[index]);
+    roomCoordinates.erase(roomCoordinates.begin() + index);
 
     do {
-        indexTopLeftRoom = 0;
-        for (unsigned i = 1; i < roomCoordinates.size(); ++i) {
-            if (gf::euclideanLength(roomCoordinates[i]) < gf::euclideanLength(roomCoordinates[indexTopLeftRoom])) {
-                indexTopLeftRoom = i;
-            }
-        }
+        // Random pick two rooms
+        unsigned indexRoom1 = gRandom().computeUniformInteger<unsigned>(0, roomCoordinates.size() - 1);
+        unsigned indexRoom2 = gRandom().computeUniformInteger<unsigned>(0, alreadyConnectedRooms.size() - 1);
+        room1 = roomCoordinates[indexRoom1];
+        room2 = alreadyConnectedRooms[indexRoom2];
 
-        // Store the first room
-        room1 = roomCoordinates[indexTopLeftRoom];
-        roomCoordinates.erase(roomCoordinates.begin() + indexTopLeftRoom);
+        // Update the vector
+        roomCoordinates.erase(roomCoordinates.begin() + indexRoom1);
+        alreadyConnectedRooms.push_back(room1);
 
-        // Search the second room
-        indexTopLeftRoom = 0;
-        for (unsigned i = 1; i < roomCoordinates.size(); ++i) {
-            if (roomCoordinates[i].x != room1.x && roomCoordinates[i].y != room1.y) {
-                continue;
-            }
+        // Define the
+        int xStep = 0;
+        int yStep = 0;
 
-            if (gf::manhattanDistance(room1, roomCoordinates[i]) < gf::manhattanDistance(room1, roomCoordinates[indexTopLeftRoom])) {
-                indexTopLeftRoom = i;
-            }
-        }
-
-        // Store the second room
-        room2 = roomCoordinates[indexTopLeftRoom];
-        roomCoordinates.erase(roomCoordinates.begin() + indexTopLeftRoom);
-
-        gf::Log::debug("%d ; %d = %d\n", room1.x, room1.y, gf::euclideanDistance(room1, room2));
-        gf::Log::debug("%d ; %d = %d\n\n", room2.x, room2.y, gf::euclideanDistance(room2, room1));
-
-        int xStart = -1;
-        int xEnd = -1;
+        // Define direction
         if (room1.x < room2.x) {
-            xStart = room1.x;
-            xEnd = room2.x;
+            xStep = 1;
         }
         else {
-            xStart = room2.x;
-            xEnd = room1.x;
+            xStep = -1;
         }
-
-        int yStart = -1;
-        int yEnd = -1;
         if (room1.y < room2.y) {
-            yStart = room1.y;
-            yEnd = room2.y;
+            yStep = 1;
         }
         else {
-            yStart = room2.y;
-            yEnd = room1.y;
+            yStep = -1;
         }
 
-        for (int x = xStart; x <= xEnd; ++x) {
-            m_layer.setTile({ x, yStart }, TileType::DebugRed + colorChoice);
+        // Create the corridor
+        if (gRandom().computeBernoulli(0.5)) { // Horizontal first
+            for (int x = room1.x; x != room2.x; x += xStep) {
+                m_layer.setTile(gf::Vector2u(x, room1.y), TileType::Floor);
+            }
+            for (int y = room1.y; y != room2.y; y += yStep) {
+                m_layer.setTile(gf::Vector2u(room2.x, y), TileType::Floor);
+            }
         }
-
-        for (int y = yStart; y <= yEnd; ++y) {
-            m_layer.setTile({ xEnd, y }, TileType::DebugRed + colorChoice);
+        else {
+            for (int y = room1.y; y != room2.y; y += yStep) { // Vertical first
+                m_layer.setTile(gf::Vector2u(room1.x, y), TileType::Floor);
+            }
+            for (int x = room1.x; x != room2.x; x += xStep) {
+                m_layer.setTile(gf::Vector2u(x, room2.y), TileType::Floor);
+            }
         }
-
-        colorChoice = (colorChoice + 1) % 5;
-    } while (roomCoordinates.size() > 1);
+    } while (roomCoordinates.size() > 0);
 }
