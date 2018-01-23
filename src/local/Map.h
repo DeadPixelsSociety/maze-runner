@@ -50,7 +50,8 @@ private:
     void generate();
     void createCorridor(std::vector<gf::Vector2i> roomCoordinates);
     void createExit(std::vector<gf::Vector2i> roomCoordinates);
-    void digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType titleType = Floor);
+    void createSpawn(std::vector<gf::Vector2i> roomCoordinates);
+    void digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType tileType = Floor);
 
 private:
     gf::Texture &m_tilesetTexture;

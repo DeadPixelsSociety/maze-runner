@@ -33,9 +33,9 @@ uint8_t Player::s_totalPlayers = 0;
 static constexpr float SpriteXScale = TileSize / 121.0f;
 static constexpr float SpriteYScale = TileSize / 153.0f;
 
-Player::Player(const gf::Vector2i position, const gf::Direction sight) :
+Player::Player(const gf::Direction sight) :
     gf::Entity(20)
-    , m_position(position)
+    , m_position({ 0, 0 })
     , m_wantsMove(false)
     , m_direction(gf::Direction::Left)
     , m_sightDirection(sight)
@@ -45,6 +45,7 @@ Player::Player(const gf::Vector2i position, const gf::Direction sight) :
     // Register message handler
     gMessageManager().registerHandler<EndTurnMessage>(&Player::onEndTurn, this);
     gMessageManager().registerHandler<MovePlayerMessage>(&Player::onMovePlayer, this);
+    gMessageManager().registerHandler<SpawnLocationMessage>(&Player::onSpawnLocation, this);
 
     // Inc the total of players
     ++s_totalPlayers;
@@ -183,6 +184,20 @@ gf::MessageStatus Player::onMovePlayer(gf::Id id, gf::Message *msg) {
     default:
         assert(false);
     }
+
+    return gf::MessageStatus::Keep;
+}
+
+gf::MessageStatus Player::onSpawnLocation(gf::Id id, gf::Message *msg) {
+    assert(id == SpawnLocationMessage::type);
+    SpawnLocationMessage *spawnLocation = reinterpret_cast<SpawnLocationMessage*>(msg);
+
+    // If is not the current player
+    if (spawnLocation->numPlayer != m_numPlayer) {
+        return gf::MessageStatus::Keep;
+    }
+
+    m_position = spawnLocation->position;
 
     return gf::MessageStatus::Keep;
 }

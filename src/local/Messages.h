@@ -38,4 +38,10 @@ struct MovePlayerMessage : public gf::Message {
     bool isValid;
 };
 
+struct SpawnLocationMessage : public gf::Message {
+    static const gf::Id type = "SpawnLocationMessage"_id;
+    gf::Vector2i position;
+    uint8_t numPlayer;
+};
+
 #endif // _LOCAL_MESSAGES_H

@@ -120,6 +120,9 @@ void Map::generate() {
 
     // Create exit
     createExit(roomCoordinates);
+
+    // Create entry
+    createSpawn(roomCoordinates);
 }
 
 void Map::createCorridor(std::vector<gf::Vector2i> roomCoordinates) {
@@ -181,7 +184,27 @@ void Map::createExit(std::vector<gf::Vector2i> roomCoordinates) {
     }
 }
 
-void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType titleType) {
+void Map::createSpawn(std::vector<gf::Vector2i> roomCoordinates) {
+    // Choose a room
+    unsigned indexRoom = gRandom().computeUniformInteger<unsigned>(0, roomCoordinates.size() - 1);
+
+    while(roomCoordinates[indexRoom].x >= MazeBounds.width * 0.25f) {
+        indexRoom = gRandom().computeUniformInteger<unsigned>(0, roomCoordinates.size() - 1);
+    }
+
+    // Set the initial position for player 1
+    SpawnLocationMessage spawn;
+    spawn.position = { roomCoordinates[indexRoom].x, roomCoordinates[indexRoom].y };
+    spawn.numPlayer = 1;
+    gMessageManager().sendMessage(&spawn);
+
+    // Set the initial position for player 2
+    spawn.position = { static_cast<int>(WorldBounds.width) - roomCoordinates[indexRoom].x - 1, roomCoordinates[indexRoom].y };
+    spawn.numPlayer = 2;
+    gMessageManager().sendMessage(&spawn);
+}
+
+void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType tileType) {
     // Define the step
     int xStep = 0;
     int yStep = 0;
@@ -203,22 +226,22 @@ void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, Tile
     // Create the corridor
     if (gRandom().computeBernoulli(0.5)) { // Horizontal first
         for (int x = room1.x; x != room2.x; x += xStep) {
-            m_layer.setTile(gf::Vector2u(x, room1.y + 1), titleType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - x - 1, room1.y + 1), titleType);
+            m_layer.setTile(gf::Vector2u(x, room1.y + 1), tileType);
+            m_layer.setTile(gf::Vector2u(WorldBounds.width - x - 1, room1.y + 1), tileType);
         }
         for (int y = room1.y; y != room2.y; y += yStep) {
-            m_layer.setTile(gf::Vector2u(room2.x, y + 1), titleType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - room2.x - 1, y + 1), titleType);
+            m_layer.setTile(gf::Vector2u(room2.x, y + 1), tileType);
+            m_layer.setTile(gf::Vector2u(WorldBounds.width - room2.x - 1, y + 1), tileType);
         }
     }
     else {
         for (int y = room1.y; y != room2.y; y += yStep) { // Vertical first
-            m_layer.setTile(gf::Vector2u(room1.x, y + 1), titleType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - room1.x - 1, y + 1), titleType);
+            m_layer.setTile(gf::Vector2u(room1.x, y + 1), tileType);
+            m_layer.setTile(gf::Vector2u(WorldBounds.width - room1.x - 1, y + 1), tileType);
         }
         for (int x = room1.x; x != room2.x; x += xStep) {
-            m_layer.setTile(gf::Vector2u(x, room2.y + 1), titleType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - x - 1, room2.y + 1), titleType);
+            m_layer.setTile(gf::Vector2u(x, room2.y + 1), tileType);
+            m_layer.setTile(gf::Vector2u(WorldBounds.width - x - 1, room2.y + 1), tileType);
         }
     }
 }

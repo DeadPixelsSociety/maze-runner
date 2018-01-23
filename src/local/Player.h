@@ -27,7 +27,7 @@
 
 class Player: public gf::Entity {
 public:
-    Player(const gf::Vector2i position, const gf::Direction sight = gf::Direction::Left);
+    explicit Player(const gf::Direction sight);
 
     void goTo(const gf::Direction direction);
 
@@ -36,6 +36,7 @@ public:
 
     gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
     gf::MessageStatus onMovePlayer(gf::Id id, gf::Message *msg);
+    gf::MessageStatus onSpawnLocation(gf::Id id, gf::Message *msg);
 
 private:
     void setEndTurn();
