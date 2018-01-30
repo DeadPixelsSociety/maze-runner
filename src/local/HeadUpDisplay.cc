@@ -74,7 +74,7 @@ void HeadUpDisplay::render(gf::RenderTarget &target, const gf::RenderStates &sta
 
 gf::MessageStatus HeadUpDisplay::onEndTurn(gf::Id id, gf::Message *msg) {
     assert(id == EndTurnMessage::type);
-    EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
+    EndTurnMessage *endTurn = static_cast<EndTurnMessage*>(msg);
 
     m_currentPlayer = endTurn->playerID;
     m_turnTime = gf::Time::zero();

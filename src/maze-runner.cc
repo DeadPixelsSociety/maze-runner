@@ -77,10 +77,37 @@ int main() {
     // Add cameras
     gf::ViewContainer views;
 
-    gf::ExtendView mainView;
-    mainView.setSize(WorldSize);
-    mainView.setCenter(0.5f * WorldSize);
-    views.addView(mainView);
+    gf::ExtendView player1View;
+    player1View.setSize(ViewSize);
+    player1View.setCenter(0.5f * WorldSize);
+    player1View.setViewport({0.0f, 0.0f, 0.5f, 1.0f});
+    views.addView(player1View);
+
+    gf::ExtendView player2View;
+    player2View.setSize(ViewSize);
+    player2View.setCenter(0.5f * WorldSize);
+    player2View.setViewport({0.5f, 0.0f, 0.5f, 1.0f});
+    views.addView(player2View);
+
+    gMessageManager().registerHandler<PlayersLocationMessage>([&player1View, &player2View](gf::Id type, gf::Message *msg) {
+        assert(type == PlayersLocationMessage::type);
+        auto positionPlayers = static_cast<PlayersLocationMessage*>(msg);
+
+        switch (positionPlayers->numPlayer) {
+        case 1:
+            player1View.setCenter(positionPlayers->position);
+            break;
+
+        case 2:
+            player2View.setCenter(positionPlayers->position);
+            break;
+
+        default:
+            assert(false);
+        }
+
+        return gf::MessageStatus::Keep;
+    });
 
     gf::ScreenView hudView;
     views.addView(hudView);
@@ -196,8 +223,12 @@ int main() {
         // Render
         renderer.clear();
 
-        // Main view
-        renderer.setView(mainView);
+        // Player1 view
+        renderer.setView(player1View);
+        mainEntities.render(renderer);
+
+        // Player2 view
+        renderer.setView(player2View);
         mainEntities.render(renderer);
 
         // HUD view

@@ -44,4 +44,10 @@ struct SpawnLocationMessage : public gf::Message {
     uint8_t numPlayer;
 };
 
+struct PlayersLocationMessage : public gf::Message {
+    static const gf::Id type = "PlayersLocationMessage"_id;
+    gf::Vector2f position;
+    uint8_t numPlayer;
+};
+
 #endif // _LOCAL_MESSAGES_H

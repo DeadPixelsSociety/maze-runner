@@ -126,6 +126,13 @@ void Player::update(gf::Time time) {
             setEndTurn();
         }
     }
+
+    // Send the current position
+    PlayersLocationMessage location;
+    location.position = m_position * TileSize + TileSize * 0.5f;
+    location.numPlayer = m_numPlayer;
+
+    gMessageManager().sendMessage(&location);
 }
 
 void Player::render(gf::RenderTarget &target, const gf::RenderStates &states) {

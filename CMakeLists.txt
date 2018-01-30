@@ -12,9 +12,9 @@ set(MR_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/games/maze-runner")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 if(MSVC)
-    add_definitions(-Wall -g -O2 -std=c++11)
+    add_definitions(-Wall -g -O2 -std=c++14)
 else()
-    add_definitions(-Wall -Wextra -g -O2 -std=c++11)
+    add_definitions(-Wall -Wextra -g -O2 -std=c++14)
 endif()
 
 add_executable(maze-runner
