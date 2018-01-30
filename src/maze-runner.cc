@@ -43,6 +43,7 @@ int main() {
     gf::RenderWindow renderer(window);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(60);
+    window.setFullscreen(true);
 
     // Set level log
     gf::Log::setLevel(gf::Log::Debug);
@@ -163,6 +164,10 @@ int main() {
     // downActionPlayer2.setContinuous(); // later
     actions.addAction(downActionPlayer2);
 
+    gf::Action fullscreenAction("Fullscreen");
+    fullscreenAction.addKeycodeKeyControl(gf::Keycode::F);
+    actions.addAction(fullscreenAction);
+
     // Dirty: set the initial turn
     EndTurnMessage msg;
     msg.playerID = 1;
@@ -184,6 +189,10 @@ int main() {
         // Actions
         if (closeWindowAction.isActive()) {
             window.close();
+        }
+
+        if (fullscreenAction.isActive()) {
+          window.toggleFullscreen();
         }
 
         // Actions for player 1
