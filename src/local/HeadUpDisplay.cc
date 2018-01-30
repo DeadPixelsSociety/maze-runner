@@ -20,6 +20,7 @@
 #include <gf/Coordinates.h>
 #include <gf/Log.h>
 #include <gf/RenderTarget.h>
+#include <gf/Shapes.h>
 #include <gf/Text.h>
 
 #include "Singletons.h"
@@ -50,7 +51,6 @@ void HeadUpDisplay::render(gf::RenderTarget &target, const gf::RenderStates &sta
     if (seconds < 0) {
         seconds = 0;
     }
-
     text.setString("Next turn in " + std::to_string(seconds) + " sec");
 
     switch (m_currentPlayer) {
@@ -67,9 +67,16 @@ void HeadUpDisplay::render(gf::RenderTarget &target, const gf::RenderStates &sta
     default:
         assert(false);
     }
-
-
     target.draw(text, states);
+
+    // Display the line between the two screens
+    gf::RectangleShape separator;
+    separator.setColor(gf::Color::Black);
+    separator.setSize({ 10.f, coordinates.getRelativeSize({ 1.0f, 1.0f }).y });
+    separator.setAnchor(gf::Anchor::Center);
+    separator.setPosition(coordinates.getCenter());
+
+    target.draw(separator, states);
 }
 
 gf::MessageStatus HeadUpDisplay::onEndTurn(gf::Id id, gf::Message *msg) {
