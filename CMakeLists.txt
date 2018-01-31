@@ -23,6 +23,7 @@ add_executable(maze-runner
     src/local/Map.cc
     src/local/Player.cc
     src/local/Singletons.cc
+    src/local/ViewManager.cc
 )
 
 target_include_directories(maze-runner

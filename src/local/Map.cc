@@ -19,6 +19,7 @@
 #include <gf/RenderTarget.h>
 #include <gf/Shapes.h>
 #include <gf/SpaceTree.h>
+#include <gf/Unused.h>
 
 #include "Constants.h"
 #include "Map.h"
@@ -43,6 +44,8 @@ Map::Map() :
 }
 
 void Map::update(gf::Time time) {
+    gf::unused(time);
+
     // Check if a player has finished the game
     for (unsigned i = 0; i < m_playerPositions.size(); ++i) {
         if (m_playerPositions[i] == m_exitCoordinates) {
@@ -72,26 +75,25 @@ gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
     switch (move->direction) {
     case gf::Direction::Up:
         newPostion = gf::Vector2u(move->position.x, move->position.y - 1);
-        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     case gf::Direction::Down:
         newPostion = gf::Vector2u(move->position.x, move->position.y + 1);
-        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     case gf::Direction::Right:
         newPostion = gf::Vector2u(move->position.x + 1, move->position.y);
-        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     case gf::Direction::Left:
         newPostion = gf::Vector2u(move->position.x - 1, move->position.y);
-        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     default:
         assert(false);
     }
+    move->isValid = moveIsValid(static_cast<TileType>(m_layer.getTile(newPostion)));
 
     // Update the player position
-    m_playerPositions[move->numPlayer - 1] = newPostion;
+    if (move->isValid) {
+        m_playerPositions[move->numPlayer - 1] = newPostion;
+    }
 
     return gf::MessageStatus::Keep;
 }
@@ -177,6 +179,7 @@ void Map::createExit(std::vector<gf::Vector2i> roomCoordinates) {
         }
     }
     m_exitCoordinates = { static_cast<int>(WorldCenter.x), static_cast<int>(y + 1)};
+    m_layer.setTile(m_exitCoordinates, TileType::DebugRed);
 
     // Pick only the most right room
     std::vector<gf::Vector2i> leftRooms;
@@ -261,4 +264,9 @@ void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, Tile
             m_layer.setTile(gf::Vector2u(WorldBounds.width - x - 1, room2.y + 1), tileType);
         }
     }
+}
+
+bool Map::moveIsValid(TileType tileType) const {
+    return tileType == TileType::Floor
+        || tileType == TileType::DebugRed;
 }

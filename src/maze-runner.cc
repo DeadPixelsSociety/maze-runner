@@ -34,6 +34,7 @@
 #include "local/Map.h"
 #include "local/Player.h"
 #include "local/Singletons.h"
+#include "local/ViewManager.h"
 
 #include "config.h"
 
@@ -110,16 +111,6 @@ int main() {
         return gf::MessageStatus::Keep;
     });
 
-    // To debug
-    gMessageManager().registerHandler<GameOverMessage>([&player1View, &player2View](gf::Id type, gf::Message *msg) {
-        assert(type == GameOverMessage::type);
-        auto gameOver = static_cast<GameOverMessage*>(msg);
-
-        gf::Log::debug("Game over: #%u\n", gameOver->numPlayer);
-
-        return gf::MessageStatus::Keep;
-    });
-
     gf::ScreenView hudView;
     views.addView(hudView);
 
@@ -183,6 +174,9 @@ int main() {
     msg.playerID = 1;
     gMessageManager().sendMessage(&msg);
 
+    // Manager to the differents
+    ViewManager viewManager(mainEntities, hudEntities, player1View, player2View, hudView);
+
     // Game loop
     gf::Clock clock;
 
@@ -236,23 +230,11 @@ int main() {
         gf::Time time = clock.restart();
 
         // Update
-        mainEntities.update(time);
-        hudEntities.update(time);
+        viewManager.update(time);
 
         // Render
         renderer.clear();
-
-        // Player1 view
-        renderer.setView(player1View);
-        mainEntities.render(renderer);
-
-        // Player2 view
-        renderer.setView(player2View);
-        mainEntities.render(renderer);
-
-        // HUD view
-        renderer.setView(hudView);
-        hudEntities.render(renderer);
+        viewManager.render(renderer);
 
         renderer.display();
 
