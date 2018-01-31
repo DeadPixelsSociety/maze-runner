@@ -87,6 +87,7 @@ void Player::update(gf::Time time) {
         move.position = m_position;
         move.direction = m_direction;
         move.isValid = true;
+        move.numPlayer = m_numPlayer;
 
         gMessageManager().sendMessage(&move);
 

@@ -57,7 +57,8 @@ private:
     gf::Texture &m_tilesetTexture;
     gf::TileLayer m_layer;
     int m_level;
-
+    gf::Vector2i m_exitCoordinates;
+    std::array<gf::Vector2i, 2> m_playerPositions;
 };
 
 #endif // _MAP_LOCAL_H

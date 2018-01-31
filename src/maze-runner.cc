@@ -110,6 +110,16 @@ int main() {
         return gf::MessageStatus::Keep;
     });
 
+    // To debug
+    gMessageManager().registerHandler<GameOverMessage>([&player1View, &player2View](gf::Id type, gf::Message *msg) {
+        assert(type == GameOverMessage::type);
+        auto gameOver = static_cast<GameOverMessage*>(msg);
+
+        gf::Log::debug("Game over: #%u\n", gameOver->numPlayer);
+
+        return gf::MessageStatus::Keep;
+    });
+
     gf::ScreenView hudView;
     views.addView(hudView);
 

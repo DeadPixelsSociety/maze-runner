@@ -43,8 +43,16 @@ Map::Map() :
 }
 
 void Map::update(gf::Time time) {
-    // gf::unused(time);
-    // Nothing
+    // Check if a player has finished the game
+    for (unsigned i = 0; i < m_playerPositions.size(); ++i) {
+        if (m_playerPositions[i] == m_exitCoordinates) {
+            GameOverMessage gameOver;
+            gameOver.numPlayer = i + 1;
+
+            gMessageManager().sendMessage(&gameOver);
+            break;
+        }
+    }
 }
 
 void Map::render(gf::RenderTarget &target, const gf::RenderStates &states) {
@@ -60,22 +68,30 @@ gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
         return gf::MessageStatus::Keep;
     }
 
+    gf::Vector2u newPostion;
     switch (move->direction) {
     case gf::Direction::Up:
-        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x, move->position.y - 1)) == TileType::Floor;
+        newPostion = gf::Vector2u(move->position.x, move->position.y - 1);
+        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     case gf::Direction::Down:
-        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x, move->position.y + 1)) == TileType::Floor;
+        newPostion = gf::Vector2u(move->position.x, move->position.y + 1);
+        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     case gf::Direction::Right:
-        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x + 1, move->position.y)) == TileType::Floor;
+        newPostion = gf::Vector2u(move->position.x + 1, move->position.y);
+        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     case gf::Direction::Left:
-        move->isValid = m_layer.getTile(gf::Vector2u(move->position.x - 1, move->position.y)) == TileType::Floor;
+        newPostion = gf::Vector2u(move->position.x - 1, move->position.y);
+        move->isValid = m_layer.getTile(newPostion) == TileType::Floor;
         break;
     default:
         assert(false);
     }
+
+    // Update the player position
+    m_playerPositions[move->numPlayer - 1] = newPostion;
 
     return gf::MessageStatus::Keep;
 }
@@ -160,6 +176,7 @@ void Map::createExit(std::vector<gf::Vector2i> roomCoordinates) {
             m_layer.setTile(gf::Vector2u(col, row), TileType::Floor);
         }
     }
+    m_exitCoordinates = { static_cast<int>(WorldCenter.x), static_cast<int>(y + 1)};
 
     // Pick only the most right room
     std::vector<gf::Vector2i> leftRooms;
