@@ -21,12 +21,14 @@
 #include <cassert>
 
 #include <gf/Log.h>
-#include <gf/Shapes.h>
+#include <gf/Sprite.h>
+#include <gf/VectorOps.h>
 
 #include "Singletons.h"
 
 MonsterManager::MonsterManager()
-: gf::Entity(50) {
+: gf::Entity(50)
+, m_demonTexture(gResourceManager().getTexture("demon.png")) {
     // Register message handler
     gMessageManager().registerHandler<MonsterSpawnMessage>(&MonsterManager::onMonsterSpawn, this);
 }
@@ -36,12 +38,24 @@ void MonsterManager::update(gf::Time time) {
 }
 
 void MonsterManager::render(gf::RenderTarget &target, const gf::RenderStates &states) {
-    for (auto &monster: m_monsters) {
-        gf::CircleShape circle(TileSize * 0.5f);
-        circle.setColor(gf::Color::Black);
-        circle.setPosition(monster.position * TileSize);
+    static constexpr float SpriteSize = 480.0f;
 
-        circle.draw(target, states);
+    for (auto &monster: m_monsters) {
+        gf::Sprite sprite;
+
+        switch (monster.type) {
+        case MonsterType::Demon:
+            sprite.setTexture(m_demonTexture);
+            break;
+
+        default:
+            assert(false);
+        }
+
+        sprite.scale(TileSize / SpriteSize);
+        sprite.setPosition(TileSize * monster.position);
+
+        sprite.draw(target, states);
     }
 }
 

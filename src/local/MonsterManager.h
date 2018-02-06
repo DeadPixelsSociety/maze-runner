@@ -23,6 +23,7 @@
 #include <vector>
 
 #include <gf/Entity.h>
+#include <gf/Texture.h>
 
 #include "Constants.h"
 #include "Messages.h"
@@ -43,7 +44,7 @@ private:
 private:
     static constexpr int TotalMonsterType = 1;
     enum MonsterType: uint8_t {
-        NoYetDefined,
+        Demon,
     };
 
     struct Monster {
@@ -55,6 +56,7 @@ private:
 private:
     std::vector<Monster> m_monsters;
     std::array<gf::Vector2i, TotalPlayers> m_playerPositions;
+    gf::Texture &m_demonTexture;
 };
 
 #endif // _LOCAL_MONSTER_MANAGER_H
