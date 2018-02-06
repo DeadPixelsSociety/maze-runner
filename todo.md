@@ -11,4 +11,3 @@
 
 - [ ] add a startup menu
 - [ ] add a mini map
-/*- [ ] add a score board? */
