@@ -21,7 +21,6 @@
 #include <gf/SpaceTree.h>
 #include <gf/Unused.h>
 
-#include "Constants.h"
 #include "Map.h"
 #include "Singletons.h"
 
@@ -222,6 +221,11 @@ void Map::createSpawn(std::vector<gf::Vector2i> roomCoordinates) {
     spawn.position = { static_cast<int>(WorldBounds.width) - roomCoordinates[indexRoom].x - 1, roomCoordinates[indexRoom].y };
     spawn.numPlayer = 2;
     gMessageManager().sendMessage(&spawn);
+
+    // Test monster spawn
+    MonsterSpawnMessage monsterSpawn;
+    monsterSpawn.position = { roomCoordinates[indexRoom].x + 1, roomCoordinates[indexRoom].y };
+    gMessageManager().sendMessage(&monsterSpawn);
 }
 
 void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType tileType) {

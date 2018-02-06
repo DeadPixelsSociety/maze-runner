@@ -130,7 +130,7 @@ void Player::update(gf::Time time) {
 
     // Send the current position
     PlayersLocationMessage location;
-    location.position = m_position * TileSize + TileSize * 0.5f;
+    location.position = m_position;
     location.numPlayer = m_numPlayer;
 
     gMessageManager().sendMessage(&location);

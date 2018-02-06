@@ -21,6 +21,7 @@ add_executable(maze-runner
     src/maze-runner.cc
     src/local/HeadUpDisplay.cc
     src/local/Map.cc
+    src/local/MonsterManager.cc
     src/local/Player.cc
     src/local/Singletons.cc
     src/local/ViewManager.cc

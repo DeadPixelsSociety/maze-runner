@@ -38,4 +38,6 @@ static constexpr gf::Vector2f ViewSize = { 9.75f * TileSize, 9.75f * TileSize };
 
 static constexpr gf::Time TimeoutTurn = gf::seconds(3.0f); // Seconds
 
+static constexpr int TotalPlayers = 2;
+
 #endif //_LOCAL_CONSTANTS_H

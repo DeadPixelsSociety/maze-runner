@@ -16,51 +16,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MAP_LOCAL_H
-#define _MAP_LOCAL_H
+#ifndef _LOCAL_MONSTER_MANAGER_H
+#define _LOCAL_MONSTER_MANAGER_H
+
+#include <array>
+#include <vector>
 
 #include <gf/Entity.h>
-#include <gf/SpaceTree.h>
-#include <gf/TileLayer.h>
-#include <gf/VectorOps.h>
 
 #include "Constants.h"
 #include "Messages.h"
 
-class Map: public gf::Entity {
+class MonsterManager : public gf::Entity {
 public:
-    Map();
+    MonsterManager();
 
     virtual void update(gf::Time time) override;
     virtual void render(gf::RenderTarget &target, const gf::RenderStates &states) override;
 
-    gf::MessageStatus onMovePlayer(gf::Id id, gf::Message *msg);
+    gf::MessageStatus onMonsterSpawn(gf::Id id, gf::Message *msg);
+    gf::MessageStatus onPlayersLocation(gf::Id id, gf::Message *msg);
 
 private:
-    enum TileType : uint8_t {
-        Floor = 0,
-        Wall = 1,
-        DebugRed = 2,
-        DebugDark = 3,
-        DebugYellow = 4,
-        DebugBlue = 5,
-        DebugWhite = 6,
+    void addNewMonster(gf::Vector2i position);
+
+private:
+    static constexpr int TotalMonsterType = 1;
+    enum MonsterType: uint8_t {
+        NoYetDefined,
+    };
+
+    struct Monster {
+        MonsterType type;
+        gf::Vector2i position; // Tile position
+        gf::Direction sightDirection;
     };
 
 private:
-    void generate();
-    void createCorridor(std::vector<gf::Vector2i> roomCoordinates);
-    void createExit(std::vector<gf::Vector2i> roomCoordinates);
-    void createSpawn(std::vector<gf::Vector2i> roomCoordinates);
-    void digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType tileType = Floor);
-    bool moveIsValid(TileType tileType) const;
-
-private:
-    gf::Texture &m_tilesetTexture;
-    gf::TileLayer m_layer;
-    int m_level;
-    gf::Vector2i m_exitCoordinates;
+    std::vector<Monster> m_monsters;
     std::array<gf::Vector2i, TotalPlayers> m_playerPositions;
 };
 
-#endif // _MAP_LOCAL_H
+#endif // _LOCAL_MONSTER_MANAGER_H

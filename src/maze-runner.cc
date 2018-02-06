@@ -32,6 +32,7 @@
 #include "local/Constants.h"
 #include "local/HeadUpDisplay.h"
 #include "local/Map.h"
+#include "local/MonsterManager.h"
 #include "local/Player.h"
 #include "local/Singletons.h"
 #include "local/ViewManager.h"
@@ -58,6 +59,10 @@ int main() {
 
     // Initialization entities
     gf::EntityContainer mainEntities;
+
+    // Set the monster manager
+    MonsterManager monsters;
+    mainEntities.addEntity(monsters);
 
     // Set the player 1
     Player player1(gf::Direction::Right);
@@ -95,13 +100,15 @@ int main() {
         assert(type == PlayersLocationMessage::type);
         auto positionPlayers = static_cast<PlayersLocationMessage*>(msg);
 
+        gf::Vector2f worldPosition = positionPlayers->position * TileSize + TileSize * 0.5f;
+
         switch (positionPlayers->numPlayer) {
         case 1:
-            player1View.setCenter(positionPlayers->position);
+            player1View.setCenter(worldPosition);
             break;
 
         case 2:
-            player2View.setCenter(positionPlayers->position);
+            player2View.setCenter(worldPosition);
             break;
 
         default:

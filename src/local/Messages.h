@@ -47,13 +47,18 @@ struct SpawnLocationMessage : public gf::Message {
 
 struct PlayersLocationMessage : public gf::Message {
     static const gf::Id type = "PlayersLocationMessage"_id;
-    gf::Vector2f position;
+    gf::Vector2i position; // Tile position
     uint8_t numPlayer;
 };
 
 struct GameOverMessage : public gf::Message {
     static const gf::Id type = "GameOverMessage"_id;
     uint8_t numPlayer;
+};
+
+struct MonsterSpawnMessage : public gf::Message {
+    static const gf::Id type = "MonsterSpawnMessage"_id;
+    gf::Vector2i position; // Tile position
 };
 
 #endif // _LOCAL_MESSAGES_H
