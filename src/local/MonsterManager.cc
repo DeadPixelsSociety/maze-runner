@@ -31,10 +31,26 @@ MonsterManager::MonsterManager()
 , m_demonTexture(gResourceManager().getTexture("demon.png")) {
     // Register message handler
     gMessageManager().registerHandler<MonsterSpawnMessage>(&MonsterManager::onMonsterSpawn, this);
+    gMessageManager().registerHandler<EndTurnMessage>(&MonsterManager::onEndTurn, this);
 }
 
 void MonsterManager::update(gf::Time time) {
-    // Do something
+    if (m_activeTurn) {
+        // We check the location for all monsters
+        for (auto &monster: m_monsters) {
+            MonsterLocationMessage locMessage;
+            locMessage.position = monster.position;
+            gMessageManager().sendMessage(&locMessage);
+
+            monster.position = locMessage.position;
+        }
+
+        // Set the new turn
+        m_activeTurn = false;
+        EndTurnMessage msg;
+        msg.playerID = 1;
+        gMessageManager().sendMessage(&msg);
+    }
 }
 
 void MonsterManager::render(gf::RenderTarget &target, const gf::RenderStates &states) {
@@ -73,6 +89,18 @@ gf::MessageStatus MonsterManager::onPlayersLocation(gf::Id id, gf::Message *msg)
     PlayersLocationMessage *move = reinterpret_cast<PlayersLocationMessage*>(msg);
 
     m_playerPositions[move->numPlayer - 1] = move->position;
+
+    return gf::MessageStatus::Keep;
+}
+
+gf::MessageStatus MonsterManager::onEndTurn(gf::Id id, gf::Message *msg) {
+    assert(id == EndTurnMessage::type);
+    EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
+
+    // If it's the turn of monster
+    if (endTurn->playerID == 0) {
+        m_activeTurn = true;
+    }
 
     return gf::MessageStatus::Keep;
 }

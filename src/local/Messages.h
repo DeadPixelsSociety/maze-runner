@@ -61,4 +61,9 @@ struct MonsterSpawnMessage : public gf::Message {
     gf::Vector2i position; // Tile position
 };
 
+struct MonsterLocationMessage : public gf::Message {
+    static const gf::Id type = "MonsterLocationMessage"_id;
+    gf::Vector2i position; // Tile position
+};
+
 #endif // _LOCAL_MESSAGES_H

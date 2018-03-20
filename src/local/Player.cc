@@ -215,6 +215,6 @@ void Player::setEndTurn() {
     m_isHisTurn = false;
     m_turnTime = gf::Time::zero();
     EndTurnMessage msg;
-    msg.playerID = (m_numPlayer % Player::s_totalPlayers) + 1;
+    msg.playerID = (m_numPlayer + 1) % (Player::s_totalPlayers + 1);
     gMessageManager().sendMessage(&msg);
 }

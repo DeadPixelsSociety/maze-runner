@@ -42,6 +42,7 @@ Map::Map() :
 
     // Register message handler
     gMessageManager().registerHandler<MovePlayerMessage>(&Map::onMovePlayer, this);
+    gMessageManager().registerHandler<MonsterLocationMessage>(&Map::onMonsterLocation, this);
 }
 
 void Map::update(gf::Time time) {
@@ -94,6 +95,32 @@ gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
     // Update the player position
     if (move->isValid) {
         m_playerPositions[move->numPlayer - 1] = newPostion;
+    }
+
+    return gf::MessageStatus::Keep;
+}
+
+gf::MessageStatus Map::onMonsterLocation(gf::Id id, gf::Message *msg) {
+    assert(id == MonsterLocationMessage::type);
+    MonsterLocationMessage *location = static_cast<MonsterLocationMessage*>(msg);
+
+    m_squareMap.clearFieldOfVision();
+
+    // We compute the monster FieldOfVision
+    m_squareMap.computeLocalFieldOfVision(location->position, 3);
+
+    // Check if the monster see a player
+    for (int i = 0; i < TotalPlayers; ++i) {
+        if (m_squareMap.isInFieldOfVision(m_playerPositions[i])) {
+        	auto route = m_squareMap.computeRoute(location->position, m_playerPositions[i], 0.0f);
+            assert(route.size() >= 2);
+
+            // Update the position of monster if needed
+            if (m_playerPositions[i] != route[1]) {
+                location->position = route[1];
+            }
+            break;
+        }
     }
 
     return gf::MessageStatus::Keep;

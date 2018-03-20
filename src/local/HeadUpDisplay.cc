@@ -54,6 +54,9 @@ void HeadUpDisplay::render(gf::RenderTarget &target, const gf::RenderStates &sta
     text.setString("Next turn in " + std::to_string(seconds) + " sec");
 
     switch (m_currentPlayer) {
+    case 0: // Monsters turn
+        // Nothing ?
+        break;
     case 1:
         text.setColor(gf::Color::fromRgba32(0x8f, 0x0e, 0x01));
         text.setAnchor(gf::Anchor::TopLeft);
