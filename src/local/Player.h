@@ -40,6 +40,7 @@ public:
 
 private:
     void setEndTurn();
+    gf::Vector2u computeNextPosition(gf::Vector2u curPosition, gf::Direction direction);
 
 private:
     gf::Vector2i m_position;

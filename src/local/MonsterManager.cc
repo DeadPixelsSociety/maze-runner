@@ -88,7 +88,7 @@ gf::MessageStatus MonsterManager::onMonsterSpawn(gf::Id id, gf::Message *msg) {
 
 gf::MessageStatus MonsterManager::onPlayersLocation(gf::Id id, gf::Message *msg) {
     assert(id == PlayersLocationMessage::type);
-    PlayersLocationMessage *move = reinterpret_cast<PlayersLocationMessage*>(msg);
+    PlayersLocationMessage *move = static_cast<PlayersLocationMessage*>(msg);
 
     m_playerPositions[move->numPlayer - 1] = move->position;
 
@@ -97,7 +97,7 @@ gf::MessageStatus MonsterManager::onPlayersLocation(gf::Id id, gf::Message *msg)
 
 gf::MessageStatus MonsterManager::onEndTurn(gf::Id id, gf::Message *msg) {
     assert(id == EndTurnMessage::type);
-    EndTurnMessage *endTurn = reinterpret_cast<EndTurnMessage*>(msg);
+    EndTurnMessage *endTurn = static_cast<EndTurnMessage*>(msg);
 
     // If it's the turn of monster
     if (endTurn->playerID == 0) {
@@ -109,18 +109,16 @@ gf::MessageStatus MonsterManager::onEndTurn(gf::Id id, gf::Message *msg) {
 
 gf::MessageStatus MonsterManager::onMovePlayer(gf::Id id, gf::Message *msg) {
     assert(id == MovePlayerMessage::type);
-    MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
+    MovePlayerMessage *move = static_cast<MovePlayerMessage*>(msg);
 
     // If the movement is already invalid, we don't check anything
     if (!move->isValid) {
         return gf::MessageStatus::Keep;
     }
 
-    gf::Vector2u newPostion = Map::computeNextPosition(move->position, move->direction);
-
     // If a monster is present
     for (auto &monster: m_monsters) {
-        if (newPostion == static_cast<gf::Vector2u>(monster.position)) {
+        if (move->newPosition == (monster.position)) {
             move->isValid = false;
             break;
         }

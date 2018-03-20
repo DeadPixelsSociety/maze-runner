@@ -33,7 +33,7 @@ struct EndTurnMessage : public gf::Message {
 
 struct MovePlayerMessage : public gf::Message {
     static const gf::Id type = "MovePlayerMessage"_id;
-    gf::Vector2i position;
+    gf::Vector2i newPosition;
     gf::Direction direction;
     uint8_t numPlayer;
     bool isValid;

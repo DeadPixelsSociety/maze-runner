@@ -84,7 +84,7 @@ void Player::update(gf::Time time) {
     if (m_wantsMove && m_isHisTurn) {
         // Send move
         MovePlayerMessage move;
-        move.position = m_position;
+        move.newPosition = computeNextPosition(m_position, m_direction);
         move.direction = m_direction;
         move.isValid = true;
         move.numPlayer = m_numPlayer;
@@ -92,28 +92,9 @@ void Player::update(gf::Time time) {
         gMessageManager().sendMessage(&move);
 
         // Update position
-        m_position = move.position;
         m_wantsMove = false;
-
-        // End of turn
         if (move.isValid) {
-            // Process move
-            switch (m_direction) {
-            case gf::Direction::Up:
-                --m_position.y;
-                break;
-            case gf::Direction::Down:
-                ++m_position.y;
-                break;
-            case gf::Direction::Right:
-                ++m_position.x;
-                break;
-            case gf::Direction::Left:
-                --m_position.x;
-                break;
-            default:
-                assert(false);
-            }
+            m_position = move.newPosition;
 
             // End of turn
             setEndTurn();
@@ -176,22 +157,7 @@ gf::MessageStatus Player::onMovePlayer(gf::Id id, gf::Message *msg) {
         return gf::MessageStatus::Keep;
     }
 
-    switch (move->direction) {
-    case gf::Direction::Up:
-        move->isValid = (gf::Vector2i(move->position.x, move->position.y - 1) != m_position);
-        break;
-    case gf::Direction::Down:
-        move->isValid = gf::Vector2i(move->position.x, move->position.y + 1) != m_position;
-        break;
-    case gf::Direction::Right:
-        move->isValid = gf::Vector2i(move->position.x + 1, move->position.y) != m_position;
-        break;
-    case gf::Direction::Left:
-        move->isValid = gf::Vector2i(move->position.x - 1, move->position.y) != m_position;
-        break;
-    default:
-        assert(false);
-    }
+    move->isValid = move->newPosition != m_position;
 
     return gf::MessageStatus::Keep;
 }
@@ -217,4 +183,27 @@ void Player::setEndTurn() {
     EndTurnMessage msg;
     msg.playerID = (m_numPlayer + 1) % (Player::s_totalPlayers + 1);
     gMessageManager().sendMessage(&msg);
+}
+
+gf::Vector2u Player::computeNextPosition(gf::Vector2u curPosition, gf::Direction direction) {
+    gf::Vector2u newPostion = curPosition;
+
+    switch (direction) {
+    case gf::Direction::Up:
+        newPostion.y--;
+        break;
+    case gf::Direction::Down:
+        newPostion.y++;
+        break;
+    case gf::Direction::Right:
+        newPostion.x++;
+        break;
+    case gf::Direction::Left:
+        newPostion.x--;
+        break;
+    default:
+        assert(false);
+    }
+
+    return newPostion;
 }

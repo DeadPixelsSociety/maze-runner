@@ -73,13 +73,11 @@ gf::MessageStatus Map::onMovePlayer(gf::Id id, gf::Message *msg) {
         return gf::MessageStatus::Keep;
     }
 
-    gf::Vector2u newPostion = Map::computeNextPosition(move->position, move->direction);
-
-    move->isValid = moveIsValid(static_cast<TileType>(m_layer.getTile(newPostion)));
+    move->isValid = moveIsValid(static_cast<TileType>(m_layer.getTile(move->newPosition)));
 
     // Update the player position
     if (move->isValid) {
-        m_playerPositions[move->numPlayer - 1] = newPostion;
+        m_playerPositions[move->numPlayer - 1] = move->newPosition;
     }
 
     return gf::MessageStatus::Keep;
@@ -111,27 +109,13 @@ gf::MessageStatus Map::onMonsterLocation(gf::Id id, gf::Message *msg) {
     return gf::MessageStatus::Keep;
 }
 
-gf::Vector2u Map::computeNextPosition(gf::Vector2u curPosition, gf::Direction direction) {
-    gf::Vector2u newPostion = curPosition;
+gf::MessageStatus Map::onPlayersLocation(gf::Id id, gf::Message *msg) {
+    assert(id == PlayersLocationMessage::type);
+    PlayersLocationMessage *move = static_cast<PlayersLocationMessage*>(msg);
 
-    switch (direction) {
-    case gf::Direction::Up:
-        newPostion.y--;
-        break;
-    case gf::Direction::Down:
-        newPostion.y++;
-        break;
-    case gf::Direction::Right:
-        newPostion.x++;
-        break;
-    case gf::Direction::Left:
-        newPostion.x--;
-        break;
-    default:
-        assert(false);
-    }
+    m_playerPositions[move->numPlayer - 1] = move->position;
 
-    return newPostion;
+    return gf::MessageStatus::Keep;
 }
 
 void Map::generate() {
