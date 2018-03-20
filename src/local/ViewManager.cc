@@ -97,9 +97,9 @@ void ViewManager::renderGameOverScreen(gf::RenderTarget &target, const gf::Rende
     gf::Coordinates coordinates(target);
 
     gf::Text text;
-    text.setString("The player #" + std::to_string(m_numWinner) + " wins!");
+    text.setString("Player #" + std::to_string(m_numWinner) + " wins!");
     text.setFont(m_font);
-    text.setColor(gf::Color::Black);
+    text.setColor(gf::Color::White);
     text.setParagraphWidth(coordinates.getRelativeSize({ 0.8f, 1.0f }).width); // Not works ?
     text.setCharacterSize(coordinates.getRelativeCharacterSize(0.1f));
     text.setAnchor(gf::Anchor::Center);

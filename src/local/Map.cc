@@ -20,6 +20,7 @@
 #include <gf/Shapes.h>
 #include <gf/SpaceTree.h>
 #include <gf/Unused.h>
+#include <gf/VectorOps.h>
 
 #include "Map.h"
 #include "Singletons.h"
@@ -30,7 +31,8 @@ static constexpr int RoomMaxSize = 9;
 Map::Map() :
     gf::Entity(10)
     , m_tilesetTexture(gResourceManager().getTexture("map_tileset.png"))
-    , m_layer(WorldBounds) {
+    , m_layer(WorldBounds)
+    , m_squareMap(WorldBounds) {
     // Init the layer
     m_layer.setTileSize({ 480, 480 });
     m_layer.setBlockSize({ static_cast<unsigned>(TileSize), static_cast<unsigned>(TileSize) });
@@ -122,8 +124,7 @@ void Map::generate() {
         // Create the room
         for (unsigned col = offset.x-1; col < static_cast<unsigned>(area.width-offset.x); ++col) {
             for (unsigned row = offset.x-1; row < static_cast<unsigned>(area.height-offset.x); ++row) {
-                m_layer.setTile({ area.left + col, area.top + row + 1 }, TileType::Floor);
-                m_layer.setTile(gf::Vector2u(WorldBounds.width - (area.left + col) - 1, area.top + row + 1), TileType::Floor);
+                setFloor({ area.left + col, area.top + row + 1 });
             }
         }
 
@@ -174,9 +175,10 @@ void Map::createExit(std::vector<gf::Vector2i> roomCoordinates) {
 
     for (unsigned col = WorldCenter.x - 1; col <= WorldCenter.x + 1; ++col) {
         for (unsigned row = y; row <= y + 2; ++row) {
-            m_layer.setTile(gf::Vector2u(col, row), TileType::Floor);
+            setFloor({ col, row }, false);
         }
     }
+    // Display the exit
     m_exitCoordinates = { static_cast<int>(WorldCenter.x), static_cast<int>(y + 1)};
     m_layer.setTile(m_exitCoordinates, TileType::DebugRed);
 
@@ -228,7 +230,7 @@ void Map::createSpawn(std::vector<gf::Vector2i> roomCoordinates) {
     gMessageManager().sendMessage(&monsterSpawn);
 }
 
-void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType tileType) {
+void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2) {
     // Define the step
     int xStep = 0;
     int yStep = 0;
@@ -250,22 +252,18 @@ void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, Tile
     // Create the corridor
     if (gRandom().computeBernoulli(0.5)) { // Horizontal first
         for (int x = room1.x; x != room2.x; x += xStep) {
-            m_layer.setTile(gf::Vector2u(x, room1.y + 1), tileType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - x - 1, room1.y + 1), tileType);
+            setFloor(gf::Vector2u(x, room1.y + 1));
         }
         for (int y = room1.y; y != room2.y; y += yStep) {
-            m_layer.setTile(gf::Vector2u(room2.x, y + 1), tileType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - room2.x - 1, y + 1), tileType);
+            setFloor(gf::Vector2u(room2.x, y + 1));
         }
     }
     else {
         for (int y = room1.y; y != room2.y; y += yStep) { // Vertical first
-            m_layer.setTile(gf::Vector2u(room1.x, y + 1), tileType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - room1.x - 1, y + 1), tileType);
+            setFloor(gf::Vector2u(room1.x, y + 1));
         }
         for (int x = room1.x; x != room2.x; x += xStep) {
-            m_layer.setTile(gf::Vector2u(x, room2.y + 1), tileType);
-            m_layer.setTile(gf::Vector2u(WorldBounds.width - x - 1, room2.y + 1), tileType);
+            setFloor(gf::Vector2u(x, room2.y + 1));
         }
     }
 }
@@ -273,4 +271,16 @@ void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, Tile
 bool Map::moveIsValid(TileType tileType) const {
     return tileType == TileType::Floor
         || tileType == TileType::DebugRed;
+}
+
+void Map::setFloor(gf::Vector2u position, bool drawSymetric) {
+    gf::Vector2u symetricPosition = gf::Vector2u(WorldBounds.width - position.x - 1, position.y);
+
+    m_layer.setTile(position, TileType::Floor);
+    m_squareMap.setCell(position, gf::CellProperty::Transparent | gf::CellProperty::Walkable);
+
+    if (drawSymetric) {
+        m_layer.setTile(symetricPosition, TileType::Floor);
+        m_squareMap.setCell(symetricPosition, gf::CellProperty::Transparent | gf::CellProperty::Walkable);
+    }
 }

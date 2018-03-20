@@ -20,6 +20,7 @@
 #define _MAP_LOCAL_H
 
 #include <gf/Entity.h>
+#include <gf/Map.h>
 #include <gf/SpaceTree.h>
 #include <gf/TileLayer.h>
 #include <gf/VectorOps.h>
@@ -52,8 +53,9 @@ private:
     void createCorridor(std::vector<gf::Vector2i> roomCoordinates);
     void createExit(std::vector<gf::Vector2i> roomCoordinates);
     void createSpawn(std::vector<gf::Vector2i> roomCoordinates);
-    void digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2, TileType tileType = Floor);
+    void digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2);
     bool moveIsValid(TileType tileType) const;
+    void setFloor(gf::Vector2u position, bool drawSymetric = true);
 
 private:
     gf::Texture &m_tilesetTexture;
@@ -61,6 +63,7 @@ private:
     int m_level;
     gf::Vector2i m_exitCoordinates;
     std::array<gf::Vector2i, TotalPlayers> m_playerPositions;
+    gf::SquareMap m_squareMap;
 };
 
 #endif // _MAP_LOCAL_H

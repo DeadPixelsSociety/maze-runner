@@ -187,7 +187,7 @@ int main() {
     // Game loop
     gf::Clock clock;
 
-    renderer.clear(gf::Color::White);
+    renderer.clear(gf::Color::Black);
 
     while (window.isOpen()) {
         // Input
