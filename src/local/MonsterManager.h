@@ -38,6 +38,7 @@ public:
     gf::MessageStatus onMonsterSpawn(gf::Id id, gf::Message *msg);
     gf::MessageStatus onPlayersLocation(gf::Id id, gf::Message *msg);
     gf::MessageStatus onEndTurn(gf::Id id, gf::Message *msg);
+    gf::MessageStatus onMovePlayer(gf::Id id, gf::Message *msg);
 
 private:
     void addNewMonster(gf::Vector2i position);

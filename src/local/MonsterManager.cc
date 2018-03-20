@@ -24,6 +24,7 @@
 #include <gf/Sprite.h>
 #include <gf/VectorOps.h>
 
+#include "Map.h"
 #include "Singletons.h"
 
 MonsterManager::MonsterManager()
@@ -32,6 +33,7 @@ MonsterManager::MonsterManager()
     // Register message handler
     gMessageManager().registerHandler<MonsterSpawnMessage>(&MonsterManager::onMonsterSpawn, this);
     gMessageManager().registerHandler<EndTurnMessage>(&MonsterManager::onEndTurn, this);
+    gMessageManager().registerHandler<MovePlayerMessage>(&MonsterManager::onMovePlayer, this);
 }
 
 void MonsterManager::update(gf::Time time) {
@@ -100,6 +102,28 @@ gf::MessageStatus MonsterManager::onEndTurn(gf::Id id, gf::Message *msg) {
     // If it's the turn of monster
     if (endTurn->playerID == 0) {
         m_activeTurn = true;
+    }
+
+    return gf::MessageStatus::Keep;
+}
+
+gf::MessageStatus MonsterManager::onMovePlayer(gf::Id id, gf::Message *msg) {
+    assert(id == MovePlayerMessage::type);
+    MovePlayerMessage *move = reinterpret_cast<MovePlayerMessage*>(msg);
+
+    // If the movement is already invalid, we don't check anything
+    if (!move->isValid) {
+        return gf::MessageStatus::Keep;
+    }
+
+    gf::Vector2u newPostion = Map::computeNextPosition(move->position, move->direction);
+
+    // If a monster is present
+    for (auto &monster: m_monsters) {
+        if (newPostion == static_cast<gf::Vector2u>(monster.position)) {
+            move->isValid = false;
+            break;
+        }
     }
 
     return gf::MessageStatus::Keep;

@@ -38,6 +38,8 @@ public:
     gf::MessageStatus onMovePlayer(gf::Id id, gf::Message *msg);
     gf::MessageStatus onMonsterLocation(gf::Id id, gf::Message *msg);
 
+    static gf::Vector2u computeNextPosition(gf::Vector2u curPosition, gf::Direction direction);
+
 private:
     enum TileType : uint8_t {
         Floor = 0,
