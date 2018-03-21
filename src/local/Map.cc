@@ -242,11 +242,6 @@ void Map::createSpawn(std::vector<gf::Vector2i> roomCoordinates) {
     spawn.position = { static_cast<int>(WorldBounds.width) - roomCoordinates[indexRoom].x - 1, roomCoordinates[indexRoom].y };
     spawn.numPlayer = 2;
     gMessageManager().sendMessage(&spawn);
-
-    // Test monster spawn
-    MonsterSpawnMessage monsterSpawn;
-    monsterSpawn.position = { roomCoordinates[indexRoom].x + 1, roomCoordinates[indexRoom].y };
-    gMessageManager().sendMessage(&monsterSpawn);
 }
 
 void Map::digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2) {
@@ -302,4 +297,17 @@ void Map::setFloor(gf::Vector2u position, bool drawSymetric) {
         m_layer.setTile(symetricPosition, TileType::Floor);
         m_squareMap.setCell(symetricPosition, gf::CellProperty::Transparent | gf::CellProperty::Walkable);
     }
+
+    // Choose if a monster spwan here
+    float rate = gRandom().computeUniformFloat(0.0f, 1.0f);
+    if (rate <= MonsterSpawnRate) {
+        spwanMonster(position);
+    }
+}
+
+void Map::spwanMonster(gf::Vector2i position) {
+    // Creaate the monster
+    MonsterSpawnMessage monsterSpawn;
+    monsterSpawn.position = position;
+    gMessageManager().sendMessage(&monsterSpawn);
 }

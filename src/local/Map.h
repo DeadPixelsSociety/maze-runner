@@ -58,6 +58,7 @@ private:
     void digCorridor(const gf::Vector2i &room1, const gf::Vector2i &room2);
     bool moveIsValid(TileType tileType) const;
     void setFloor(gf::Vector2u position, bool drawSymetric = true);
+    void spwanMonster(gf::Vector2i position);
 
 private:
     gf::Texture &m_tilesetTexture;
