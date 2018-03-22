@@ -44,7 +44,10 @@ void MonsterManager::update(gf::Time time) {
             locMessage.position = monster.position;
             gMessageManager().sendMessage(&locMessage);
 
-            monster.position = locMessage.position;
+            // If the position is empty
+            if (isEmptyTile(locMessage.position)) {
+                monster.position = locMessage.position;
+            }
         }
 
         // Set the new turn
@@ -139,4 +142,14 @@ void MonsterManager::addNewMonster(gf::Vector2i position) {
     monster.position = position;
 
     m_monsters.push_back(monster);
+}
+
+bool MonsterManager::isEmptyTile(gf::Vector2i position) {
+    for (auto &monster: m_monsters) {
+        if (monster.position == position) {
+            return false;
+        }
+    }
+
+    return true;
 }

@@ -42,6 +42,7 @@ public:
 
 private:
     void addNewMonster(gf::Vector2i position);
+    bool isEmptyTile(gf::Vector2i position);
 
 private:
     static constexpr int TotalMonsterType = 1;
