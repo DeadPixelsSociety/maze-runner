@@ -30,9 +30,10 @@ static constexpr gf::Vector2u MazeBounds = { 51, 51 }; // Number of tiles
 static constexpr gf::Vector2u MazeCenter = { 25, 25 }; // Tiles coordinates
 
 static constexpr gf::Vector2u WorldOffset = { 5, 5 }; // Number of tiles
-static constexpr gf::Vector2u WorldBounds = { (MazeBounds.data[0] * 2) + WorldOffset.data[0], MazeBounds.data[1] + WorldOffset.data[1] }; // Number of tiles
-static constexpr gf::Vector2u WorldCenter = { WorldBounds.data[0] / 2, WorldBounds.data[1] / 2 }; // Tiles coordinates
-static constexpr gf::Vector2f WorldSize = { WorldBounds.data[0] * TileSize, WorldBounds.data[1] * TileSize }; // pixel // dirty
+// static constexpr gf::Vector2u WorldBounds = { (MazeBounds.data[0] * 2) + WorldOffset.data[0], MazeBounds.data[1] + WorldOffset.data[1] }; // Number of tiles
+static constexpr gf::Vector2u WorldBounds = { (MazeBounds.x * 2) + WorldOffset.x, MazeBounds.y + WorldOffset.y }; // Number of tiles
+static constexpr gf::Vector2u WorldCenter = { WorldBounds.x / 2, WorldBounds.y / 2 }; // Tiles coordinates
+static constexpr gf::Vector2f WorldSize = { WorldBounds.x * TileSize, WorldBounds.y * TileSize }; // pixel // dirty
 
 static constexpr gf::Vector2f ViewSize = { 9.75f * TileSize, 9.75f * TileSize }; //  World units
 

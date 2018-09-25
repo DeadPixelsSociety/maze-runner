@@ -21,7 +21,7 @@
 
 #include <gf/Entity.h>
 #include <gf/Map.h>
-#include <gf/SpaceTree.h>
+#include <gf/RandomBinaryTree.h>
 #include <gf/TileLayer.h>
 #include <gf/VectorOps.h>
 

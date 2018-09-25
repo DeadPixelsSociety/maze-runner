@@ -18,7 +18,6 @@
 
 #include <gf/RenderTarget.h>
 #include <gf/Shapes.h>
-#include <gf/SpaceTree.h>
 #include <gf/Unused.h>
 #include <gf/VectorOps.h>
 
@@ -128,13 +127,13 @@ void Map::generate() {
 
     // Split the map into sub rect
     auto offset = WorldOffset / 2;
-    gf::SpaceTree root(gf::RectI(offset, MazeBounds));
-    root.splitRecursive(gRandom(), 8, { RoomMinSize, RoomMinSize }, { RoomMaxSize, RoomMaxSize });
+    gf::RandomBinaryTree root(gf::RectI(offset, MazeBounds));
+    root.create(gRandom(), 8, { RoomMinSize, RoomMinSize }, { RoomMaxSize, RoomMaxSize });
 
     std::vector<gf::Vector2i> roomCoordinates;
 
     // Create each rooms
-    root.traverseInvertedLevelOrder([this, &roomCoordinates, offset](const gf::SpaceTree& node) {
+    root.traverseInvertedLevelOrder([this, &roomCoordinates, offset](const gf::RandomBinaryTree& root, const gf::RandomBinaryTree::Node& node) {
         if (!node.isLeaf()) {
             return true;
         }
